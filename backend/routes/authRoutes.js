@@ -24,4 +24,25 @@ router.post("/register", async (req, res) => {
 });
 
 
+// LOGIN
+router.post("/login", async (req, res) => {
+  const { email, password } = req.body;
 
+  const user = db
+    .prepare("SELECT * FROM users WHERE email = ?")
+    .get(email);
+
+  if (!user || !(await bcrypt.compare(password, user.password))) {
+    return res.status(400).json({ message: "Invalid credentials" });
+  }
+
+  const token = jwt.sign(
+    { id: user.id, role: user.role },
+    process.env.JWT_SECRET,
+    { expiresIn: "1d" }
+  );
+
+  res.json({ token, user });
+});
+
+module.exports = router;
