@@ -4,7 +4,7 @@ import AgentDashboard from './pages/AgentDashboard.jsx'
 import Dashboard from './pages/Dashboard.jsx'
 import Login from './pages/Login.jsx'
 import Register from './pages/Register.jsx'
-import CreateTicket from './pages/TicketForm.jsx'
+import CreateTicket from './pages/CreateTicket.jsx'
 import UserDashboard from './pages/UserDashboard.jsx'
 
 function App() {
@@ -50,4 +50,6 @@ function App() {
   )
 }
 
-export default App
+export default App;
+
+
