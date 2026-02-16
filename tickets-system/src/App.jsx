@@ -1,34 +1,52 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
-//hi 
-function App() {
-  const [count, setCount] = useState(0)
+import { Navigate, Route, Routes } from 'react-router-dom'
+import ProtectedRoute from './components/ProtectedRoute.jsx'
+import AgentDashboard from './pages/AgentDashboard.jsx'
+import Dashboard from './pages/Dashboard.jsx'
+import Login from './pages/Login.jsx'
+import Register from './pages/Register.jsx'
+import CreateTicket from './pages/TicketForm.jsx'
+import UserDashboard from './pages/UserDashboard.jsx'
 
+function App() {
   return (
-    <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.jsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
+    <Routes>
+      <Route path='/' element={<Navigate to='/login' replace />} />
+      <Route path='/login' element={<Login />} />
+      <Route path='/register' element={<Register />} />
+      <Route
+        path='/dashboard'
+        element={
+          <ProtectedRoute>
+            <Dashboard />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path='/user-dashboard'
+        element={
+          <ProtectedRoute role='user'>
+            <UserDashboard />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path='/agent-dashboard'
+        element={
+          <ProtectedRoute role='agent'>
+            <AgentDashboard />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path='/create-ticket'
+        element={
+          <ProtectedRoute role='user'>
+            <CreateTicket />
+          </ProtectedRoute>
+        }
+      />
+      <Route path='*' element={<Navigate to='/login' replace />} />
+    </Routes>
   )
 }
 
