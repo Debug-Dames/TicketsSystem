@@ -51,12 +51,18 @@ const UserDashboard = () => {
     return { total, open, inProgress, resolved };
   }, [tickets]);
 
-  const updateStatus = (ticketId, nextStatus) => {
-    setTickets((prev) =>
-      prev.map((ticket) =>
-        ticket.id === ticketId ? { ...ticket, status: nextStatus } : ticket
-      )
-    );
+  const deleteTicket = (ticketId) => {
+    setTickets((prev) => prev.filter((ticket) => ticket.id !== ticketId));
+  };
+
+  const getAutoUpdateMessage = (status) => {
+    if (status === "Resolved") {
+      return "Auto-updated: ticket resolved";
+    }
+    if (status === "In Progress") {
+      return "Auto-updating from support team";
+    }
+    return "Waiting for support update";
   };
 
   return (
@@ -131,31 +137,38 @@ const UserDashboard = () => {
                   <th>Priority</th>
                   <th>Created</th>
                   <th>Status</th>
-                  <th>Change</th>
+                  <th>Actions</th>
                 </tr>
               </thead>
               <tbody>
-                {tickets.map((ticket) => (
-                  <tr key={ticket.id}>
-                    <td>{ticket.id}</td>
-                    <td>{ticket.title}</td>
-                    <td>{ticket.category}</td>
-                    <td>{ticket.priority}</td>
-                    <td>{ticket.createdAt}</td>
-                    <td><span className={statusStyles[ticket.status]}>{ticket.status}</span></td>
-                    <td>
-                      <select
-                        value={ticket.status}
-                        onChange={(e) => updateStatus(ticket.id, e.target.value)}
-                        className="status-select"
-                      >
-                        <option value="Open">Open</option>
-                        <option value="In Progress">In Progress</option>
-                        <option value="Resolved">Resolved</option>
-                      </select>
-                    </td>
+                {tickets.length === 0 ? (
+                  <tr>
+                    <td colSpan="7">No tickets available.</td>
                   </tr>
-                ))}
+                ) : (
+                  tickets.map((ticket) => (
+                    <tr key={ticket.id}>
+                      <td>{ticket.id}</td>
+                      <td>{ticket.title}</td>
+                      <td>{ticket.category}</td>
+                      <td>{ticket.priority}</td>
+                      <td>{ticket.createdAt}</td>
+                      <td><span className={statusStyles[ticket.status]}>{ticket.status}</span></td>
+                      <td>
+                        <div className="table-actions">
+                          <button
+                            type="button"
+                            className="table-delete-btn"
+                            onClick={() => deleteTicket(ticket.id)}
+                          >
+                            Delete
+                          </button>
+                          <p className="table-update-note">{getAutoUpdateMessage(ticket.status)}</p>
+                        </div>
+                      </td>
+                    </tr>
+                  ))
+                )}
               </tbody>
             </table>
           </div>

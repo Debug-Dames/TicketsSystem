@@ -1,6 +1,7 @@
 import React from "react";
 import Navbar from "../components/Navbar.jsx";
 import TicketForm from "../components/TicketForm.jsx";
+import "../styles/dashboard.css";
 
 const CreateTicket = () => {
   const handleTicketSubmit = (ticket) => {
@@ -9,11 +10,15 @@ const CreateTicket = () => {
   };
 
   return (
-    <div className="min-h-screen bg-[#1a1a1a]">
+    <div className="create-ticket-page">
       <Navbar userType="user" />
-      <div className="p-6 max-w-lg mx-auto">
-        <TicketForm onSubmit={handleTicketSubmit} />
-      </div>
+      <main className="create-ticket-container">
+        <section className="panel create-ticket-panel">
+          <h1 className="section-title">Create Ticket</h1>
+          <p className="hero-copy">Select a ticket title and description to submit faster.</p>
+          <TicketForm onSubmit={handleTicketSubmit} />
+        </section>
+      </main>
     </div>
   );
 };
