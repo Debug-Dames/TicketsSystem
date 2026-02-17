@@ -7,9 +7,13 @@ import ForgotPassword from './pages/ForgotPassword.jsx'
 import Login from './pages/Login.jsx'
 import MyTickets from './pages/MyTickets.jsx'
 import Register from './pages/Register.jsx'
+<<<<<<< HEAD
 import Reports from './pages/Reports.jsx'
 import Settings from './pages/Settings.jsx'
 import CreateTicket from './pages/TicketForm.jsx'
+=======
+import CreateTicket from './pages/CreateTicket.jsx'
+>>>>>>> origin/nomzamo
 import UserDashboard from './pages/UserDashboard.jsx'
 
 function App() {
@@ -60,4 +64,6 @@ function App() {
   )
 }
 
-export default App
+export default App;
+
+

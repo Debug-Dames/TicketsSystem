@@ -29,7 +29,7 @@ function Login() {
       return
     }
 
-    navigate(result.user.role === 'agent' ? '/agent-dashboard' : '/create-ticket')
+    navigate(result.user.role === 'user' ? '/user-dashboard' : '/create-ticket')
   }
 
   return (

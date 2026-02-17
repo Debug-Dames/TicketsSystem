@@ -1,31 +1,28 @@
-import { Link, useNavigate } from "react-router-dom";
-import { useContext } from "react";
-import { AuthContext } from "../context/AuthContext";
-import "../styles/navbar.css";
+import React from "react";
+import { Link } from "react-router-dom";
+import "../styles/dashboard.css";
 
-const NavBar = () => {
-  const { user, logout } = useContext(AuthContext);
-  const navigate = useNavigate();
-
-  const handleLogout = () => {
-    logout();
-    navigate("/");
-  };
-
+const Navbar = ({ userType }) => {
   return (
-    <nav className="navbar">
-      <div className="logo">IT Support</div>
-      {user && (
-        <div className="links">
-          <Link to="/dashboard">Dashboard</Link>
-          {user.role === "user" && <Link to="/create-ticket">Create Ticket</Link>}
-          {user.role === "agent" && <Link to="/all-tickets">All Tickets</Link>}
-          <button onClick={handleLogout}>Logout</button>
+    <nav className="app-navbar">
+      <div className="app-navbar-inner">
+        <h1 className="app-navbar-title">Debug Dames Ticketing System</h1>
+        <div className="app-navbar-links">
+          <Link to="/" className="app-nav-link">Home</Link>
+        {userType === "user" && (
+          <>
+              <Link to="/create-ticket" className="app-nav-link">Create Ticket</Link>
+              <Link to="/user" className="app-nav-link">My Tickets</Link>
+          </>
+        )}
+        {userType === "agent" && (
+            <Link to="/agent" className="app-nav-link">All Tickets</Link>
+        )}
+          <Link to="/login" className="app-nav-link">Logout</Link>
         </div>
-      )}
+      </div>
     </nav>
   );
 };
 
-export default NavBar;
-
+export default Navbar;
