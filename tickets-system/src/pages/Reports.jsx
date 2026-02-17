@@ -1,21 +1,19 @@
 import { useContext, useMemo, useState } from 'react'
-import { useNavigate } from 'react-router-dom'
-import TicketsTable from '../components/TicketsTable.jsx'
 import { AuthContext } from '../context/AuthContext.jsx'
 import '../styles/dashboard.css'
-import '../styles/tickets.css'
 
 const TICKETS_KEY = 'mockTickets'
 
-function UserDashboard() {
-  const { user, logout } = useContext(AuthContext)
-  const navigate = useNavigate()
+function Reports() {
+  const { user } = useContext(AuthContext)
   const [allTickets] = useState(() => JSON.parse(localStorage.getItem(TICKETS_KEY)) || [])
 
-  const visibleTickets = useMemo(
-    () => allTickets.filter((ticket) => ticket.createdBy === user?.email),
-    [allTickets, user?.email],
-  )
+  const visibleTickets = useMemo(() => {
+    if (!user) return []
+    if (user.role === 'agent') return allTickets
+    return allTickets.filter((ticket) => ticket.createdBy === user.email)
+  }, [allTickets, user])
+
   const openCount = useMemo(() => visibleTickets.filter((ticket) => ticket.status === 'Open').length, [visibleTickets])
   const inProgressCount = useMemo(
     () => visibleTickets.filter((ticket) => ticket.status === 'In Progress').length,
@@ -26,19 +24,16 @@ function UserDashboard() {
     [visibleTickets],
   )
 
-  const handleLogout = () => {
-    logout()
-    navigate('/login')
-  }
-
   return (
     <main className='dashboard-page'>
       <section className='dashboard-card'>
         <div className='dashboard-hero'>
           <div>
-            <p className='dashboard-kicker'>Workspace</p>
-            <h1>User Dashboard</h1>
-            <p className='dashboard-subtitle'>Track your submitted tickets in one view.</p>
+            <p className='dashboard-kicker'>Insights</p>
+            <h1>Reports</h1>
+            <p className='dashboard-subtitle'>
+              {user?.role === 'agent' ? 'Operational overview of all tickets.' : 'Summary of your ticket activity.'}
+            </p>
           </div>
         </div>
 
@@ -60,17 +55,9 @@ function UserDashboard() {
             <p>{resolvedCount}</p>
           </article>
         </div>
-
-        <TicketsTable tickets={visibleTickets} isAgent={false} />
-
-        <div className='dashboard-actions'>
-          <button type='button' onClick={handleLogout}>
-            Logout
-          </button>
-        </div>
       </section>
     </main>
   )
 }
 
-export default UserDashboard
+export default Reports

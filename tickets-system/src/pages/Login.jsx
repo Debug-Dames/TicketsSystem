@@ -6,6 +6,7 @@ import '../styles/login.css'
 function Login() {
   const { login } = useContext(AuthContext)
   const navigate = useNavigate()
+  const [showPassword, setShowPassword] = useState(false)
   const [form, setForm] = useState({
     email: '',
     password: '',
@@ -53,6 +54,8 @@ function Login() {
               name='email'
               type='email'
               placeholder='you@example.com'
+              autoComplete='email'
+              className='auth-input'
               value={form.email}
               onChange={handleChange}
               required
@@ -60,19 +63,33 @@ function Login() {
           </div>
           <div className='form-group'>
             <label htmlFor='password'>Password</label>
-            <input
-              id='password'
-              name='password'
-              type='password'
-              placeholder='Enter password'
-              value={form.password}
-              onChange={handleChange}
-              required
-            />
+            <div className='input-with-action'>
+              <input
+                id='password'
+                name='password'
+                type={showPassword ? 'text' : 'password'}
+                placeholder='Enter password'
+                autoComplete='current-password'
+                className='auth-input'
+                value={form.password}
+                onChange={handleChange}
+                required
+              />
+              <button
+                type='button'
+                className='input-action-button'
+                onClick={() => setShowPassword((current) => !current)}
+              >
+                {showPassword ? 'Hide' : 'Show'}
+              </button>
+            </div>
           </div>
+          <p className='forgot-password-link'>
+            <Link to='/forgot-password'>Forgot password?</Link>
+          </p>
           <div className='form-group'>
             <label htmlFor='role'>Role</label>
-            <select id='role' name='role' value={form.role} onChange={handleChange} required>
+            <select id='role' name='role' className='auth-select' value={form.role} onChange={handleChange} required>
               <option value='' disabled>
                 Select role
               </option>

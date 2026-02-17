@@ -1,5 +1,4 @@
 import { useContext, useMemo, useState } from 'react'
-import { useNavigate } from 'react-router-dom'
 import TicketsTable from '../components/TicketsTable.jsx'
 import { AuthContext } from '../context/AuthContext.jsx'
 import { TICKET_CATEGORIES, TICKET_TITLES } from '../data/ticketOptions'
@@ -9,8 +8,7 @@ import '../styles/tickets.css'
 const TICKETS_KEY = 'mockTickets'
 
 function AgentDashboard() {
-  const { user, logout } = useContext(AuthContext)
-  const navigate = useNavigate()
+  const { user } = useContext(AuthContext)
   const [titleFilter, setTitleFilter] = useState('all')
   const [categoryFilter, setCategoryFilter] = useState('all')
   const [allTickets, setAllTickets] = useState(() => {
@@ -41,11 +39,6 @@ function AgentDashboard() {
     [visibleTickets],
   )
 
-  const handleLogout = () => {
-    logout()
-    navigate('/login')
-  }
-
   const handleStatusChange = (ticketId, status, comment) => {
     const cleanComment = comment?.trim()
     const updated = allTickets.map((ticket) => {
@@ -66,7 +59,10 @@ function AgentDashboard() {
           <div>
             <p className='dashboard-kicker'>Operations</p>
             <h1>Support Agent Dashboard</h1>
-            <p className='dashboard-subtitle'>Monitor, update and resolve incoming support tickets.</p>
+            <p className='dashboard-subtitle'>
+              Monitor, update and resolve incoming support tickets. Support agents see all tickets on the agent
+              dashboard.
+            </p>
           </div>
         </div>
 
@@ -119,12 +115,6 @@ function AgentDashboard() {
         </div>
 
         <TicketsTable tickets={visibleTickets} isAgent onStatusChange={handleStatusChange} />
-
-        <div className='dashboard-actions'>
-          <button type='button' onClick={handleLogout}>
-            Logout
-          </button>
-        </div>
       </section>
     </main>
   )

@@ -1,18 +1,11 @@
 .dashboard-page {
-  min-height: 100vh;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 28px;
-  background:
-    radial-gradient(circle at 10% 10%, rgba(244, 114, 182, 0.2), transparent 36%),
-    radial-gradient(circle at 90% 84%, rgba(196, 181, 253, 0.25), transparent 34%),
-    linear-gradient(180deg, #f5d0fe, #ede9fe);
+  min-height: 100%;
+  padding: 0;
 }
 
 .dashboard-card {
-  width: min(1240px, 100%);
-  min-height: min(860px, calc(100vh - 56px));
+  width: 100%;
+  min-height: 100%;
   background: rgba(255, 255, 255, 0.96);
   border-radius: 22px;
   padding: 36px;
