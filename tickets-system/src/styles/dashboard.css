@@ -7,6 +7,7 @@
   width: 100%;
   min-height: 100%;
   background: rgba(255, 255, 255, 0.96);
+  color: #4c1d95;
   border-radius: 22px;
   padding: 36px;
   border: 1px solid #f5d0fe;
@@ -90,6 +91,9 @@
   border: 1px solid #d8b4fe;
   border-radius: 10px;
   padding: 10px 11px;
+  background: #fff;
+  color: #4c1d95;
+  margin-bottom: 0;
 }
 
 .dashboard-actions {
@@ -467,6 +471,9 @@
 .create-ticket-panel {
   max-width: 620px;
   margin: 0 auto;
+  background: rgba(255, 255, 255, 0.97);
+  border: 1px solid #eadcff;
+  box-shadow: 0 10px 28px rgba(85, 44, 140, 0.12);
 }
 
 .create-ticket-form {
@@ -505,9 +512,13 @@
 
 .file-control {
   width: 100%;
+  border: 1px solid #d9c7f3;
+  border-radius: 10px;
+  background: #fff;
+  color: #3d3158;
+  padding: 0.55rem 0.65rem;
   margin-bottom: 0.8rem;
-  color: #5a4a76;
-  font-size: 0.84rem;
+  font-size: 0.86rem;
 }
 
 .form-submit-btn {
