@@ -1,0 +1,65 @@
+import { useContext, useMemo, useState } from 'react'
+import TicketsTable from '../components/TicketsTable.jsx'
+import { AuthContext } from '../context/AuthContext.jsx'
+import '../styles/dashboard.css'
+import '../styles/tickets.css'
+
+const TICKETS_KEY = 'mockTickets'
+
+function MyTickets() {
+  const { user } = useContext(AuthContext)
+  const [allTickets, setAllTickets] = useState(() => {
+    const stored = JSON.parse(localStorage.getItem(TICKETS_KEY)) || []
+    return stored.map((ticket, index) => ({
+      ...ticket,
+      id: ticket.id || `legacy-${index}-${ticket.title || 'ticket'}`,
+      comments: Array.isArray(ticket.comments) ? ticket.comments : [],
+    }))
+  })
+
+  const visibleTickets = useMemo(() => {
+    if (!user) return []
+    if (user.role === 'agent') {
+      return allTickets.filter((ticket) => Boolean(ticket.createdBy))
+    }
+    return allTickets.filter((ticket) => ticket.createdBy === user.email)
+  }, [allTickets, user])
+
+  const handleStatusChange = (ticketId, status, comment) => {
+    if (user?.role !== 'agent') return
+
+    const cleanComment = comment?.trim()
+    const updated = allTickets.map((ticket) => {
+      if (ticket.id !== ticketId) return ticket
+      const nextComments = cleanComment
+        ? [...(ticket.comments || []), { by: user.email, text: cleanComment, at: new Date().toISOString() }]
+        : ticket.comments || []
+      return { ...ticket, status, comments: nextComments }
+    })
+
+    setAllTickets(updated)
+    localStorage.setItem(TICKETS_KEY, JSON.stringify(updated))
+  }
+
+  return (
+    <main className='dashboard-page'>
+      <section className='dashboard-card'>
+        <div className='dashboard-hero'>
+          <div>
+            <p className='dashboard-kicker'>Tickets</p>
+            <h1>My Tickets</h1>
+            <p className='dashboard-subtitle'>
+              {user?.role === 'agent'
+                ? 'Tickets created by users.'
+                : 'Tickets you have submitted and their status.'}
+            </p>
+          </div>
+        </div>
+
+        <TicketsTable tickets={visibleTickets} isAgent={user?.role === 'agent'} onStatusChange={handleStatusChange} />
+      </section>
+    </main>
+  )
+}
+
+export default MyTickets
