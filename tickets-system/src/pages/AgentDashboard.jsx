@@ -1,28 +1,20 @@
-import { useContext, useMemo, useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useContext, useEffect, useMemo, useState } from 'react'
 import TicketsTable from '../components/TicketsTable.jsx'
 import { AuthContext } from '../context/AuthContext.jsx'
 import { TICKET_CATEGORIES, TICKET_TITLES } from '../data/ticketOptions'
+import { getTickets, saveTickets, subscribeTickets } from '../utils/ticketsStore'
 import '../styles/dashboard.css'
 import '../styles/tickets.css'
 
-const TICKETS_KEY = 'mockTickets'
-
 function AgentDashboard() {
-  const { user, logout } = useContext(AuthContext)
-  const navigate = useNavigate()
+  const { user } = useContext(AuthContext)
   const [titleFilter, setTitleFilter] = useState('all')
   const [categoryFilter, setCategoryFilter] = useState('all')
-  const [allTickets, setAllTickets] = useState(() => {
-    const stored = JSON.parse(localStorage.getItem(TICKETS_KEY)) || []
-    const normalized = stored.map((ticket, index) => ({
-      ...ticket,
-      id: ticket.id || `legacy-${index}-${ticket.title || 'ticket'}`,
-      comments: Array.isArray(ticket.comments) ? ticket.comments : [],
-    }))
-    localStorage.setItem(TICKETS_KEY, JSON.stringify(normalized))
-    return normalized
-  })
+  const [allTickets, setAllTickets] = useState(() => getTickets())
+
+  useEffect(() => {
+    return subscribeTickets(setAllTickets)
+  }, [])
 
   const visibleTickets = useMemo(() => {
     return allTickets.filter((ticket) => {
@@ -41,11 +33,6 @@ function AgentDashboard() {
     [visibleTickets],
   )
 
-  const handleLogout = () => {
-    logout()
-    navigate('/login')
-  }
-
   const handleStatusChange = (ticketId, status, comment) => {
     const cleanComment = comment?.trim()
     const updated = allTickets.map((ticket) => {
@@ -56,7 +43,7 @@ function AgentDashboard() {
       return { ...ticket, status, comments: nextComments }
     })
     setAllTickets(updated)
-    localStorage.setItem(TICKETS_KEY, JSON.stringify(updated))
+    saveTickets(updated)
   }
 
   return (
@@ -66,7 +53,10 @@ function AgentDashboard() {
           <div>
             <p className='dashboard-kicker'>Operations</p>
             <h1>Support Agent Dashboard</h1>
-            <p className='dashboard-subtitle'>Monitor, update and resolve incoming support tickets.</p>
+            <p className='dashboard-subtitle'>
+              Monitor, update and resolve incoming support tickets. Support agents see all tickets on the agent
+              dashboard.
+            </p>
           </div>
         </div>
 
@@ -119,12 +109,6 @@ function AgentDashboard() {
         </div>
 
         <TicketsTable tickets={visibleTickets} isAgent onStatusChange={handleStatusChange} />
-
-        <div className='dashboard-actions'>
-          <button type='button' onClick={handleLogout}>
-            Logout
-          </button>
-        </div>
       </section>
     </main>
   )

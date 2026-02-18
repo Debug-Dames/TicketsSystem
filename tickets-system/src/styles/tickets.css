@@ -102,6 +102,10 @@
   vertical-align: top;
 }
 
+.tickets-table td {
+  color: #4c1d95;
+}
+
 .tickets-table th {
   background: linear-gradient(180deg, #fdf4ff, #fae8ff);
   color: #701a75;
@@ -123,6 +127,8 @@
   padding: 7px 8px;
   min-width: 128px;
   background: #fff;
+  color: #4c1d95;
+  margin-bottom: 0;
 }
 
 .comment-input {
@@ -131,6 +137,9 @@
   border: 1px solid #d8b4fe;
   border-radius: 8px;
   padding: 8px;
+  background: #fff;
+  color: #4c1d95;
+  margin-bottom: 0;
   resize: vertical;
 }
 
