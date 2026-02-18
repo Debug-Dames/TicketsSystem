@@ -89,12 +89,33 @@ export function AuthProvider({ children }) {
     localStorage.removeItem(CURRENT_USER_KEY)
   }
 
+  const resetPassword = async ({ email, password }) => {
+    const users = readJson(USERS_KEY, [])
+    const normalizedEmail = email.trim().toLowerCase()
+    const userIndex = users.findIndex((item) => item.email === normalizedEmail)
+
+    if (userIndex === -1) {
+      return { ok: false, error: 'No account found for this email.' }
+    }
+
+    const passwordHash = await hashPassword(password)
+    const updatedUsers = [...users]
+    updatedUsers[userIndex] = {
+      ...updatedUsers[userIndex],
+      passwordHash,
+    }
+
+    localStorage.setItem(USERS_KEY, JSON.stringify(updatedUsers))
+    return { ok: true }
+  }
+
   const value = useMemo(
     () => ({
       user,
       register,
       login,
       logout,
+      resetPassword,
     }),
     [user],
   )
