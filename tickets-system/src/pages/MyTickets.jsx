@@ -1,21 +1,17 @@
-import { useContext, useMemo, useState } from 'react'
+import { useContext, useEffect, useMemo, useState } from 'react'
 import TicketsTable from '../components/TicketsTable.jsx'
 import { AuthContext } from '../context/AuthContext.jsx'
+import { getTickets, saveTickets, subscribeTickets } from '../utils/ticketsStore'
 import '../styles/dashboard.css'
 import '../styles/tickets.css'
 
-const TICKETS_KEY = 'mockTickets'
-
 function MyTickets() {
   const { user } = useContext(AuthContext)
-  const [allTickets, setAllTickets] = useState(() => {
-    const stored = JSON.parse(localStorage.getItem(TICKETS_KEY)) || []
-    return stored.map((ticket, index) => ({
-      ...ticket,
-      id: ticket.id || `legacy-${index}-${ticket.title || 'ticket'}`,
-      comments: Array.isArray(ticket.comments) ? ticket.comments : [],
-    }))
-  })
+  const [allTickets, setAllTickets] = useState(() => getTickets())
+
+  useEffect(() => {
+    return subscribeTickets(setAllTickets)
+  }, [])
 
   const visibleTickets = useMemo(() => {
     if (!user) return []
@@ -38,7 +34,7 @@ function MyTickets() {
     })
 
     setAllTickets(updated)
-    localStorage.setItem(TICKETS_KEY, JSON.stringify(updated))
+    saveTickets(updated)
   }
 
   return (

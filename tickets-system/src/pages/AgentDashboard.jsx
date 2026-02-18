@@ -1,26 +1,20 @@
-import { useContext, useMemo, useState } from 'react'
+import { useContext, useEffect, useMemo, useState } from 'react'
 import TicketsTable from '../components/TicketsTable.jsx'
 import { AuthContext } from '../context/AuthContext.jsx'
 import { TICKET_CATEGORIES, TICKET_TITLES } from '../data/ticketOptions'
+import { getTickets, saveTickets, subscribeTickets } from '../utils/ticketsStore'
 import '../styles/dashboard.css'
 import '../styles/tickets.css'
-
-const TICKETS_KEY = 'mockTickets'
 
 function AgentDashboard() {
   const { user } = useContext(AuthContext)
   const [titleFilter, setTitleFilter] = useState('all')
   const [categoryFilter, setCategoryFilter] = useState('all')
-  const [allTickets, setAllTickets] = useState(() => {
-    const stored = JSON.parse(localStorage.getItem(TICKETS_KEY)) || []
-    const normalized = stored.map((ticket, index) => ({
-      ...ticket,
-      id: ticket.id || `legacy-${index}-${ticket.title || 'ticket'}`,
-      comments: Array.isArray(ticket.comments) ? ticket.comments : [],
-    }))
-    localStorage.setItem(TICKETS_KEY, JSON.stringify(normalized))
-    return normalized
-  })
+  const [allTickets, setAllTickets] = useState(() => getTickets())
+
+  useEffect(() => {
+    return subscribeTickets(setAllTickets)
+  }, [])
 
   const visibleTickets = useMemo(() => {
     return allTickets.filter((ticket) => {
@@ -49,7 +43,7 @@ function AgentDashboard() {
       return { ...ticket, status, comments: nextComments }
     })
     setAllTickets(updated)
-    localStorage.setItem(TICKETS_KEY, JSON.stringify(updated))
+    saveTickets(updated)
   }
 
   return (

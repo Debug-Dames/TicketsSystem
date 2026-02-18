@@ -7,13 +7,9 @@ import ForgotPassword from './pages/ForgotPassword.jsx'
 import Login from './pages/Login.jsx'
 import MyTickets from './pages/MyTickets.jsx'
 import Register from './pages/Register.jsx'
-<<<<<<< HEAD
 import Reports from './pages/Reports.jsx'
 import Settings from './pages/Settings.jsx'
-import CreateTicket from './pages/TicketForm.jsx'
-=======
 import CreateTicket from './pages/CreateTicket.jsx'
->>>>>>> origin/nomzamo
 import UserDashboard from './pages/UserDashboard.jsx'
 
 function App() {
@@ -34,6 +30,8 @@ function App() {
         <Route path='/my-tickets' element={<MyTickets />} />
         <Route path='/reports' element={<Reports />} />
         <Route path='/settings' element={<Settings />} />
+        <Route path='/user' element={<Navigate to='/user-dashboard' replace />} />
+        <Route path='/agent' element={<Navigate to='/agent-dashboard' replace />} />
         <Route
           path='/user-dashboard'
           element={

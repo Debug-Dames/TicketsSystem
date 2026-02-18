@@ -27,6 +27,7 @@ function Layout() {
   const navigate = useNavigate()
 
   const pageTitle = useMemo(() => TITLES[location.pathname] || 'Ticket System', [location.pathname])
+  const showPageHeader = location.pathname !== '/create-ticket'
   const navItems = useMemo(() => {
     if (user?.role === 'agent') {
       return NAV_ITEMS.filter((item) => item.path !== '/create-ticket')
@@ -65,9 +66,11 @@ function Layout() {
       </aside>
 
       <div className='app-main'>
-        <header className='app-header'>
-          <h1>{pageTitle}</h1>
-        </header>
+        {showPageHeader && (
+          <header className='app-header'>
+            <h1>{pageTitle}</h1>
+          </header>
+        )}
         <section className='app-content'>
           <Outlet />
         </section>
