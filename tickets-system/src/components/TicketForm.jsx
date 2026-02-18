@@ -1,5 +1,44 @@
 import React, { useState } from "react";
 
+const ticketTemplates = [
+  {
+    title: "Login issue",
+    category: "Authentication",
+    descriptions: [
+      "I cannot log in with my email and password.",
+      "I reset my password but login still fails.",
+      "I get an invalid credentials error after signup.",
+    ],
+  },
+  {
+    title: "Profile update bug",
+    category: "Frontend",
+    descriptions: [
+      "Profile photo does not update after saving.",
+      "Changes in profile details are not reflected.",
+      "Edit profile page freezes on submit.",
+    ],
+  },
+  {
+    title: "Payment confirmation delay",
+    category: "Billing",
+    descriptions: [
+      "Payment completed but confirmation email is delayed.",
+      "I was charged but ticket status says unpaid.",
+      "Invoice is missing after successful payment.",
+    ],
+  },
+  {
+    title: "Other issue",
+    category: "General",
+    descriptions: [
+      "General support request.",
+      "I need help with account settings.",
+      "I found an issue not listed above.",
+    ],
+  },
+];
+
 const TicketForm = ({ onSubmit }) => {
   const [ticket, setTicket] = useState({
     title: "",
@@ -9,11 +48,25 @@ const TicketForm = ({ onSubmit }) => {
     attachments: [],
   });
 
+  const selectedTemplate = ticketTemplates.find((item) => item.title === ticket.title);
+
   const handleChange = (e) => {
-    setTicket({ ...ticket, [e.target.name]: e.target.value });
+    const { name, value } = e.target;
+    setTicket((prev) => ({ ...prev, [name]: value }));
   };
 
-   const handleFileChange = (e) => {
+  const handleTitleChange = (e) => {
+    const title = e.target.value;
+    const template = ticketTemplates.find((item) => item.title === title);
+    setTicket((prev) => ({
+      ...prev,
+      title,
+      category: template ? template.category : "",
+      description: "",
+    }));
+  };
+
+  const handleFileChange = (e) => {
     setTicket({ ...ticket, attachments: Array.from(e.target.files) });
   };
 
@@ -25,58 +78,93 @@ const TicketForm = ({ onSubmit }) => {
 
 
   return (
-    <form onSubmit={handleSubmit} 
-          className="bg-[#111] p-6 rounded-lg shadow-lg">
-
-      <h2 className="text-2xl font-bold mb-4 text-primaryPurple">Create Ticket</h2>
-      <input
-        type="text"
+    <form onSubmit={handleSubmit} className="create-ticket-form">
+      <label className="form-label" htmlFor="title">
+        Ticket Title
+      </label>
+      <select
+        id="title"
         name="title"
         value={ticket.title}
-        onChange={handleChange}
-        placeholder="Title"
-        className="w-full border p-2 mb-3 rounded bg-[#222] text-white"
+        onChange={handleTitleChange}
+        className="form-control"
         required
-      />
+      >
+        <option value="">Select a ticket title</option>
+        {ticketTemplates.map((item) => (
+          <option key={item.title} value={item.title}>
+            {item.title}
+          </option>
+        ))}
+      </select>
+
+      <div className="mb-6">
+      <label 
+         className="block text-sm font-medium text-slate-700 mb-2" 
+         htmlFor="description">
+         Description
+      </label>
       <textarea
+        id="description"
         name="description"
         value={ticket.description}
         onChange={handleChange}
-        placeholder="Description"
-        className="w-full border p-2 mb-3 rounded bg-[#222] text-white"
+        rows={4}
+        className="w-full rounded-xl border border-purple-200 px-4 py-3 text-slate-700 focus:outline-none focus:ring-2 focus:ring-purple-400 focus:border-purple-400 transition resize-none"
+        placeholder={
+          selectedTemplate
+            ? `Describe the issue about "${selectedTemplate.title}".`
+            : "Describe your issue in detail."
+        }
         required
       />
-      <input
-        type="text"
+    </div>
+
+      <label className="form-label" htmlFor="category">
+        Category
+      </label>
+      <select
+        id="category"
         name="category"
         value={ticket.category}
         onChange={handleChange}
-        placeholder="Category"
-        className="w-full border p-2 mb-3 rounded bg-[#222] text-white"
+        className="form-control"
         required
-      />
+      >
+        <option value="">Select category</option>
+        <option value="Authentication">Authentication</option>
+        <option value="Frontend">Frontend</option>
+        <option value="Billing">Billing</option>
+        <option value="General">General</option>
+      </select>
+
+      <label className="form-label" htmlFor="priority">
+        Priority
+      </label>
       <select
+        id="priority"
         name="priority"
         value={ticket.priority}
         onChange={handleChange}
-        className="w-full border p-2 mb-3 rounded bg-[#222] text-white"
+        className="form-control"
       >
- 
-        <option>Low</option>
-        <option>Medium</option>
-        <option>High</option>
+        <option value="Low">Low</option>
+        <option value="Medium">Medium</option>
+        <option value="High">High</option>
       </select>
+
+      <label className="form-label" htmlFor="attachments">
+        Attachments
+      </label>
       <input
+        id="attachments"
         type="file"
         multiple
         onChange={handleFileChange}
-        className="w-full mb-3 text-white"
+        className="file-control"
       />
 
-      <button
-        type="submit"
-        className="bg-accentPink text-white px-4 py-2 rounded hover:bg-softRed"
-      >
+      <button type="submit" className="primary-action-btn form-submit-btn">
         Submit
       </button>
     </form>
