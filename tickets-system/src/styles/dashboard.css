@@ -1,19 +1,13 @@
 .dashboard-page {
-  min-height: 100vh;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 28px;
-  background:
-    radial-gradient(circle at 10% 10%, rgba(244, 114, 182, 0.2), transparent 36%),
-    radial-gradient(circle at 90% 84%, rgba(196, 181, 253, 0.25), transparent 34%),
-    linear-gradient(180deg, #f5d0fe, #ede9fe);
+  min-height: 100%;
+  padding: 0;
 }
 
 .dashboard-card {
-  width: min(1240px, 100%);
-  min-height: min(860px, calc(100vh - 56px));
+  width: 100%;
+  min-height: 100%;
   background: rgba(255, 255, 255, 0.96);
+  color: #4c1d95;
   border-radius: 22px;
   padding: 36px;
   border: 1px solid #f5d0fe;
@@ -97,6 +91,9 @@
   border: 1px solid #d8b4fe;
   border-radius: 10px;
   padding: 10px 11px;
+  background: #fff;
+  color: #4c1d95;
+  margin-bottom: 0;
 }
 
 .dashboard-actions {
@@ -144,9 +141,9 @@
 }
 
 .app-navbar {
-  background: #7c3aed;
+  background: linear-gradient(135deg, #7e22ce, #db2777);
   color: #fff;
-  box-shadow: 0 2px 10px rgba(32, 12, 67, 0.2);
+  box-shadow: 0 10px 20px rgba(190, 24, 93, 0.25);
 }
 
 .app-navbar-inner {
@@ -174,7 +171,7 @@
   flex-wrap: wrap;
 }
 
-.app-nav-link {
+.app-navbar .app-nav-link {
   color: #fff;
   text-decoration: none;
   font-size: 0.9rem;
@@ -183,9 +180,19 @@
   transition: background-color 0.2s ease;
 }
 
-.app-nav-link:hover {
+.app-navbar .app-nav-link:hover {
   background: rgba(255, 255, 255, 0.2);
   color: #fff;
+}
+
+.app-navbar .app-nav-button {
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  font-family: inherit;
+  font-weight: 600;
+  box-shadow: none;
+  transform: none;
 }
 
 .user-dashboard-container {
@@ -392,6 +399,34 @@
   box-shadow: 0 0 0 2px rgba(159, 103, 235, 0.2);
 }
 
+.table-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  align-items: flex-start;
+}
+
+.table-delete-btn {
+  border: 1px solid #f1bfd1;
+  background: #fff1f6;
+  color: #b4235d;
+  border-radius: 8px;
+  padding: 0.28rem 0.55rem;
+  font-size: 0.78rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.table-delete-btn:hover {
+  background: #ffe6ef;
+}
+
+.table-update-note {
+  margin: 0;
+  font-size: 0.72rem;
+  color: #6e5d86;
+}
+
 @media (max-width: 900px) {
   .stats-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -420,4 +455,73 @@
   .app-navbar-title {
     font-size: 1rem;
   }
+}
+
+.create-ticket-page {
+  min-height: 100vh;
+  background: linear-gradient(140deg, #fff4fb 0%, #f7edff 55%, #efe8ff 100%);
+}
+
+.create-ticket-container {
+  max-width: 980px;
+  margin: 0 auto;
+  padding: 1.2rem 1rem 2rem;
+}
+
+.create-ticket-panel {
+  max-width: 620px;
+  margin: 0 auto;
+  background: rgba(255, 255, 255, 0.97);
+  border: 1px solid #eadcff;
+  box-shadow: 0 10px 28px rgba(85, 44, 140, 0.12);
+}
+
+.create-ticket-form {
+  margin-top: 0.9rem;
+}
+
+.form-label {
+  display: block;
+  font-size: 0.83rem;
+  font-weight: 600;
+  color: #5f4b82;
+  margin: 0 0 0.3rem;
+}
+
+.form-control {
+  width: 100%;
+  border: 1px solid #d9c7f3;
+  border-radius: 10px;
+  background: #fff;
+  color: #3d3158;
+  font-size: 0.9rem;
+  padding: 0.55rem 0.65rem;
+  margin-bottom: 0.75rem;
+}
+
+.form-control:focus {
+  outline: none;
+  border-color: #9f67eb;
+  box-shadow: 0 0 0 2px rgba(159, 103, 235, 0.2);
+}
+
+.form-textarea {
+  min-height: 110px;
+  resize: vertical;
+}
+
+.file-control {
+  width: 100%;
+  border: 1px solid #d9c7f3;
+  border-radius: 10px;
+  background: #fff;
+  color: #3d3158;
+  padding: 0.55rem 0.65rem;
+  margin-bottom: 0.8rem;
+  font-size: 0.86rem;
+}
+
+.form-submit-btn {
+  border: none;
+  cursor: pointer;
 }

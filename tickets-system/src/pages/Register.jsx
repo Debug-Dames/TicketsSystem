@@ -6,6 +6,7 @@ import '../styles/login.css'
 function Register() {
   const { register } = useContext(AuthContext)
   const navigate = useNavigate()
+  const [showPassword, setShowPassword] = useState(false)
   const [form, setForm] = useState({
     name: '',
     email: '',
@@ -54,6 +55,8 @@ function Register() {
               name='name'
               type='text'
               placeholder='Your full name'
+              autoComplete='name'
+              className='auth-input'
               value={form.name}
               onChange={handleChange}
               required
@@ -66,6 +69,8 @@ function Register() {
               name='email'
               type='email'
               placeholder='you@example.com'
+              autoComplete='email'
+              className='auth-input'
               value={form.email}
               onChange={handleChange}
               required
@@ -73,19 +78,32 @@ function Register() {
           </div>
           <div className='form-group'>
             <label htmlFor='password'>Password</label>
-            <input
-              id='password'
-              name='password'
-              type='password'
-              placeholder='Create password'
-              value={form.password}
-              onChange={handleChange}
-              required
-            />
+            <div className='input-with-action'>
+              <input
+                id='password'
+                name='password'
+                type={showPassword ? 'text' : 'password'}
+                placeholder='Create password'
+                autoComplete='new-password'
+                className='auth-input'
+                minLength={8}
+                value={form.password}
+                onChange={handleChange}
+                required
+              />
+              <button
+                type='button'
+                className='input-action-button'
+                onClick={() => setShowPassword((current) => !current)}
+              >
+                {showPassword ? 'Hide' : 'Show'}
+              </button>
+            </div>
+            <small className='field-hint'>Use at least 8 characters.</small>
           </div>
           <div className='form-group'>
             <label htmlFor='role'>Role</label>
-            <select id='role' name='role' value={form.role} onChange={handleChange} required>
+            <select id='role' name='role' className='auth-select' value={form.role} onChange={handleChange} required>
               <option value='' disabled>
                 Select role
               </option>

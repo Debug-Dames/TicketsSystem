@@ -1,5 +1,5 @@
 const router = require("express").Router();
-const db = require("../db/db");
+const db = require("../db/initDatabase");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 
@@ -7,42 +7,58 @@ const jwt = require("jsonwebtoken");
 // REGISTER
 router.post("/register", async (req, res) => {
   const { name, email, password, role = "user" } = req.body;
- 
-  const hashed = await bcrypt.hash(password, 10);
 
   try {
-    const stmt = db.prepare(
-      "INSERT INTO users (name, email, password, role) VALUES (?, ?, ?, ?)"
+    const hashed = await bcrypt.hash(password, 10);
+
+    db.run(
+      "INSERT INTO users (name, email, password, role) VALUES (?, ?, ?, ?)",
+      [name, email, hashed, role],
+      function (err) {
+        if (err) {
+          console.error(err);
+          return res.status(400).json({ message: "Email already exists" });
+        }
+
+        res.json({ id: this.lastID });
+      }
     );
-
-    const result = stmt.run(name, email, hashed, role);
-
-    res.json({ id: result.lastInsertRowid });
-  } catch {
-    res.status(400).json({ message: "Email already exists" });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "Server error" });
   }
 });
+
 
 
 // LOGIN
 router.post("/login", async (req, res) => {
   const { email, password } = req.body;
 
-  const user = db
-    .prepare("SELECT * FROM users WHERE email = ?")
-    .get(email);
+  db.get(
+    "SELECT * FROM users WHERE email = ?",
+    [email],
+    async (err, user) => {
+      if (err || !user) {
+        return res.status(400).json({ message: "Invalid credentials" });
+      }
 
-  if (!user || !(await bcrypt.compare(password, user.password))) {
-    return res.status(400).json({ message: "Invalid credentials" });
-  }
+      const valid = await bcrypt.compare(password, user.password);
 
-  const token = jwt.sign(
-    { id: user.id, role: user.role },
-    process.env.JWT_SECRET,
-    { expiresIn: "1d" }
+      if (!valid) {
+        return res.status(400).json({ message: "Invalid credentials" });
+      }
+
+      const token = jwt.sign(
+        { id: user.id, role: user.role },
+        process.env.JWT_SECRET,
+        { expiresIn: "1d" }
+      );
+
+      res.json({ token, user });
+    }
   );
-
-  res.json({ token, user });
 });
+
 
 module.exports = router;
