@@ -1,6 +1,7 @@
 import { useContext, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { AuthContext } from '../context/AuthContext.jsx'
+import logo from '../assets/react.svg'
 import '../styles/login.css'
 
 function Register() {
@@ -37,6 +38,7 @@ function Register() {
     <div className='login-container'>
       <div className='auth-shell'>
         <section className='auth-aside'>
+          <img src={logo} alt='DebugDames logo' className='auth-logo-large' />
           <p className='auth-kicker'>Get Started</p>
           <h2>Create Your Support Profile</h2>
           <p>
@@ -94,9 +96,10 @@ function Register() {
               <button
                 type='button'
                 className='input-action-button'
+                aria-label={showPassword ? 'Hide password' : 'Show password'}
                 onClick={() => setShowPassword((current) => !current)}
               >
-                {showPassword ? 'Hide' : 'Show'}
+                <span className={`password-toggle-icon${showPassword ? ' is-visible' : ''}`} aria-hidden='true' />
               </button>
             </div>
             <small className='field-hint'>Use at least 8 characters.</small>

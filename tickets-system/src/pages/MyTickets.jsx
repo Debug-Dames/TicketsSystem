@@ -43,7 +43,6 @@ function MyTickets() {
         <div className='dashboard-hero'>
           <div>
             <p className='dashboard-kicker'>Tickets</p>
-            <h1>My Tickets</h1>
             <p className='dashboard-subtitle'>
               {user?.role === 'agent'
                 ? 'Tickets created by users.'

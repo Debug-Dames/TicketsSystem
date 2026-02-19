@@ -17,7 +17,7 @@
   grid-template-columns: 1.05fr 1fr;
   border-radius: 26px;
   overflow: hidden;
-  border: 1px solid rgba(233, 213, 255, 0.65);
+  border: 2px solid rgba(233, 213, 255, 0.8);
   box-shadow: 0 30px 58px rgba(59, 7, 100, 0.45);
   backdrop-filter: blur(2px);
 }
@@ -25,9 +25,17 @@
 .auth-aside {
   padding: 48px;
   color: #f5f3ff;
+  border-right: 1px solid rgba(255, 255, 255, 0.24);
   background:
     radial-gradient(circle at 18% 14%, rgba(255, 255, 255, 0.2), transparent 38%),
     linear-gradient(160deg, rgba(124, 58, 237, 0.78), rgba(190, 24, 93, 0.74));
+}
+
+.auth-logo-large {
+  width: min(280px, 70%);
+  display: block;
+  margin: 0 0 16px;
+  filter: drop-shadow(0 8px 18px rgba(76, 29, 149, 0.35));
 }
 
 .auth-kicker {
@@ -58,6 +66,7 @@
   margin: 0 auto;
   padding: 48px 32px;
   background: rgba(255, 255, 255, 0.97);
+  border: 2px solid #f5d0fe;
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -151,16 +160,57 @@
   transform: translateY(-50%);
   border: none;
   border-radius: 10px;
-  padding: 6px 10px;
+  width: 36px;
+  height: 36px;
+  padding: 0;
   background: #f3e8ff;
   color: #7e22ce;
   font-size: 0.82rem;
   font-weight: 700;
   cursor: pointer;
+  display: grid;
+  place-items: center;
 }
 
 .input-action-button:hover {
   background: #e9d5ff;
+}
+
+.auth-input[type='password']::-ms-reveal,
+.auth-input[type='password']::-ms-clear {
+  display: none;
+}
+
+.password-toggle-icon {
+  width: 16px;
+  height: 10px;
+  border: 2px solid #7e22ce;
+  border-radius: 10px;
+  position: relative;
+  display: inline-block;
+}
+
+.password-toggle-icon::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 4px;
+  height: 4px;
+  border-radius: 999px;
+  background: #7e22ce;
+  transform: translate(-50%, -50%);
+}
+
+.password-toggle-icon.is-visible::before {
+  content: '';
+  position: absolute;
+  top: -2px;
+  left: 50%;
+  width: 2px;
+  height: 14px;
+  background: #7e22ce;
+  transform: translateX(-50%) rotate(45deg);
 }
 
 .field-hint {
@@ -243,10 +293,17 @@
 
   .auth-aside {
     padding: 28px;
+    border-right: none;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.24);
   }
 
   .login-form {
     max-width: 100%;
     padding: 32px;
+    border-left: 2px solid #f5d0fe;
+  }
+
+  .auth-logo-large {
+    width: min(220px, 64%);
   }
 }
