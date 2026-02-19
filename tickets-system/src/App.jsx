@@ -14,11 +14,59 @@ import UserDashboard from './pages/UserDashboard.jsx'
 
 function App() {
   return (
+    // <Routes>
+    //   <Route path='/' element={<Navigate to='/login' replace />} />
+    //   <Route path='/login' element={<Login />} />
+    //   <Route path='/forgot-password' element={<ForgotPassword />} />
+    //   <Route path='/register' element={<Register />} />
+    //   <Route
+    //     element={
+    //       <ProtectedRoute>
+    //         <Layout />
+    //       </ProtectedRoute>
+    //     }
+    //   >
+    //     <Route path='/dashboard' element={<Dashboard />} />
+    //     <Route path='/my-tickets' element={<MyTickets />} />
+    //     <Route path='/reports' element={<Reports />} />
+    //     <Route path='/settings' element={<Settings />} />
+    //     <Route path='/user' element={<Navigate to='/user-dashboard' replace />} />
+    //     <Route path='/agent' element={<Navigate to='/agent-dashboard' replace />} />
+    //     <Route
+    //       path='/user-dashboard'
+    //       element={
+    //         <ProtectedRoute role='user'>
+    //           <UserDashboard />
+    //         </ProtectedRoute>
+    //       }
+    //     />
+    //     <Route
+    //       path='/agent-dashboard'
+    //       element={
+    //         <ProtectedRoute role='support'>
+    //           <AgentDashboard />
+    //         </ProtectedRoute>
+    //       }
+    //     />
+    //     <Route
+    //       path='/create-ticket'
+    //       element={
+    //         <ProtectedRoute role='user'>
+    //           <CreateTicket />
+    //         </ProtectedRoute>
+    //       }
+    //     />
+    //   </Route>
+    //   <Route path='*' element={<Navigate to='/login' replace />} />
+    // </Routes>
+
     <Routes>
-      <Route path='/' element={<Navigate to='/login' replace />} />
-      <Route path='/login' element={<Login />} />
-      <Route path='/forgot-password' element={<ForgotPassword />} />
-      <Route path='/register' element={<Register />} />
+      <Route path="/" element={<Navigate to="/login" replace />} />
+      <Route path="/login" element={<Login />} />
+      <Route path="/forgot-password" element={<ForgotPassword />} />
+      <Route path="/register" element={<Register />} />
+
+      {/* Protected routes */}
       <Route
         element={
           <ProtectedRoute>
@@ -26,39 +74,42 @@ function App() {
           </ProtectedRoute>
         }
       >
-        <Route path='/dashboard' element={<Dashboard />} />
-        <Route path='/my-tickets' element={<MyTickets />} />
-        <Route path='/reports' element={<Reports />} />
-        <Route path='/settings' element={<Settings />} />
-        <Route path='/user' element={<Navigate to='/user-dashboard' replace />} />
-        <Route path='/agent' element={<Navigate to='/agent-dashboard' replace />} />
+        {/* Role-specific dashboards */}
         <Route
-          path='/user-dashboard'
+          path="/user-dashboard"
           element={
-            <ProtectedRoute role='user'>
+            <ProtectedRoute role="user">
               <UserDashboard />
             </ProtectedRoute>
           }
         />
         <Route
-          path='/agent-dashboard'
+          path="/agent-dashboard"
           element={
-            <ProtectedRoute role='agent'>
+            <ProtectedRoute role="support">
               <AgentDashboard />
             </ProtectedRoute>
           }
         />
+
+        {/* Other protected routes */}
+        <Route path="/my-tickets" element={<MyTickets />} />
+        <Route path="/reports" element={<Reports />} />
+        <Route path="/settings" element={<Settings />} />
         <Route
-          path='/create-ticket'
+          path="/create-ticket"
           element={
-            <ProtectedRoute role='user'>
+            <ProtectedRoute role="user">
               <CreateTicket />
             </ProtectedRoute>
           }
         />
       </Route>
-      <Route path='*' element={<Navigate to='/login' replace />} />
+
+      {/* Catch-all */}
+      <Route path="*" element={<Navigate to="/login" replace />} />
     </Routes>
+
   )
 }
 

@@ -5,8 +5,19 @@ import { AuthContext } from '../context/AuthContext'
 const ProtectedRoute = ({ children, role }) => {
   const { user } = useContext(AuthContext)
 
-  if (!user) return <Navigate to='/login' replace />
-  if (role && user.role !== role) return <Navigate to='/dashboard' replace />
+  // if (!user) return <Navigate to='/login' replace />
+  // if (role && user.role !== role) return <Navigate to='/dashboard' replace />
+
+  // If a role is required and doesn't match, redirect to the correct dashboard
+  if (role && user.role !== role) {
+    return (
+      <Navigate
+        to={user.role === "support" ? "/agent-dashboard" : "/user-dashboard"}
+        replace
+      />
+    );
+  }
+
 
   return children
 }
