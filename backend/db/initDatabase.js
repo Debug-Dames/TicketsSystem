@@ -26,13 +26,18 @@ const createTables = async () => {
       );
     `);
 
+    await pool.query(`
+      ALTER TABLE tickets
+      ADD COLUMN IF NOT EXISTS comment TEXT;
+    `);
+
     
     await pool.query(`
         ALTER TABLE tickets
         ADD COLUMN IF NOT EXISTS assigned_to INTEGER
         REFERENCES users(id)
         ON DELETE SET NULL;
-        `);
+        `); 
 
     await pool.query(`
         CREATE TABLE IF NOT EXISTS ticket_comments (
