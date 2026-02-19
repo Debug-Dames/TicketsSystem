@@ -1,0 +1,27 @@
+const API_URL = "http://localhost:5000/api";
+
+export async function registerUser({ name, email, password, role }) {
+  const res = await fetch(`${API_URL}/auth/register`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ name, email, password, role }),
+  });
+  console.log("Register request body:", req.body);
+  return res.json();
+}
+
+export async function loginUser({ email, password, role }) {
+  const res = await fetch(`${API_URL}/auth/login`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ email, password, role }),
+  });
+  return res.json();
+}
+
+export async function getTickets(token) {
+  const res = await fetch(`${API_URL}/tickets/my`, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  return res.json();
+}
