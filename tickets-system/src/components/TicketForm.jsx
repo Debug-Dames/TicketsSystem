@@ -83,6 +83,11 @@ const TicketForm = ({ onSubmit }) => {
     setTicket({ title: '', description: '', category: '', application: '', priority: 'Low', attachments: [] })
   }
 
+  const attachmentCount = ticket.attachments.length
+  const attachmentSummary = attachmentCount
+    ? `${attachmentCount} file${attachmentCount > 1 ? 's' : ''} selected`
+    : 'No files selected yet'
+
   return (
     <form onSubmit={handleSubmit} className='create-ticket-form'>
       <label className='form-label' htmlFor='title'>
@@ -178,13 +183,19 @@ const TicketForm = ({ onSubmit }) => {
       <label className='form-label' htmlFor='attachments'>
         Attachments
       </label>
-      <input
-        id='attachments'
-        type='file'
-        multiple
-        onChange={handleFileChange}
-        className='file-control'
-      />
+      <div className='upload-control'>
+        <input
+          id='attachments'
+          type='file'
+          multiple
+          onChange={handleFileChange}
+          className='file-input-hidden'
+        />
+        <label htmlFor='attachments' className='upload-btn'>
+          Upload Files
+        </label>
+        <p className='upload-file-hint'>{attachmentSummary}</p>
+      </div>
 
       <button type='submit' className='primary-action-btn form-submit-btn'>
         Submit
