@@ -1,52 +1,58 @@
 import React, { useState } from 'react'
+import { TICKET_APPLICATIONS, TICKET_CATEGORIES, TICKET_TITLES } from '../data/ticketOptions'
 
 const ticketTemplates = [
   {
-    title: "Login issue",
-    category: "Authentication",
+    title: 'Cannot sign in',
+    category: 'Account Access',
+    application: 'Microsoft 365',
     descriptions: [
-      "I cannot log in with my email and password.",
-      "I reset my password but login still fails.",
-      "I get an invalid credentials error after signup.",
+      'I cannot log in with my email and password.',
+      'I reset my password but login still fails.',
+      'I get an invalid credentials error after sign-in.',
     ],
   },
   {
-    title: "Profile update bug",
-    category: "Frontend",
+    title: 'Email not syncing',
+    category: 'Email & Collaboration',
+    application: 'Microsoft 365',
     descriptions: [
-      "Profile photo does not update after saving.",
-      "Changes in profile details are not reflected.",
-      "Edit profile page freezes on submit.",
+      'My mailbox is not updating on desktop.',
+      'New messages appear late.',
+      'Calendar invites are not syncing.',
     ],
   },
   {
-    title: "Payment confirmation delay",
-    category: "Billing",
+    title: 'VPN access issue',
+    category: 'Network & Connectivity',
+    application: 'VPN Client',
     descriptions: [
-      "Payment completed but confirmation email is delayed.",
-      "I was charged but ticket status says unpaid.",
-      "Invoice is missing after successful payment.",
+      'I cannot connect to the company VPN.',
+      'VPN keeps disconnecting.',
+      'VPN asks for credentials repeatedly.',
     ],
   },
   {
-    title: "Other issue",
-    category: "General",
+    title: 'Application crash',
+    category: 'Software & Applications',
+    application: 'Other',
     descriptions: [
-      "General support request.",
-      "I need help with account settings.",
-      "I found an issue not listed above.",
+      'The app crashes when opened.',
+      'I see an unexpected error message.',
+      'The app freezes during normal use.',
     ],
   },
-];
+]
 
 const TicketForm = ({ onSubmit }) => {
   const [ticket, setTicket] = useState({
     title: '',
     description: '',
     category: '',
+    application: '',
     priority: 'Low',
     attachments: [],
-  });
+  })
 
   const selectedTemplate = ticketTemplates.find((item) => item.title === ticket.title)
 
@@ -62,6 +68,7 @@ const TicketForm = ({ onSubmit }) => {
       ...prev,
       title,
       category: template ? template.category : '',
+      application: template ? template.application : '',
       description: '',
     }))
   }
@@ -73,8 +80,13 @@ const TicketForm = ({ onSubmit }) => {
   const handleSubmit = (e) => {
     e.preventDefault()
     onSubmit(ticket)
-    setTicket({ title: '', description: '', category: '', priority: 'Low', attachments: [] })
+    setTicket({ title: '', description: '', category: '', application: '', priority: 'Low', attachments: [] })
   }
+
+  const attachmentCount = ticket.attachments.length
+  const attachmentSummary = attachmentCount
+    ? `${attachmentCount} file${attachmentCount > 1 ? 's' : ''} selected`
+    : 'No files selected yet'
 
   return (
     <form onSubmit={handleSubmit} className='create-ticket-form'>
@@ -90,9 +102,9 @@ const TicketForm = ({ onSubmit }) => {
         required
       >
         <option value=''>Select a ticket title</option>
-        {ticketTemplates.map((item) => (
-          <option key={item.title} value={item.title}>
-            {item.title}
+        {TICKET_TITLES.map((title) => (
+          <option key={title} value={title}>
+            {title}
           </option>
         ))}
       </select>
@@ -127,10 +139,30 @@ const TicketForm = ({ onSubmit }) => {
         required
       >
         <option value=''>Select category</option>
-        <option value='Authentication'>Authentication</option>
-        <option value='Frontend'>Frontend</option>
-        <option value='Billing'>Billing</option>
-        <option value='General'>General</option>
+        {TICKET_CATEGORIES.map((category) => (
+          <option key={category} value={category}>
+            {category}
+          </option>
+        ))}
+      </select>
+
+      <label className='form-label' htmlFor='application'>
+        Application
+      </label>
+      <select
+        id='application'
+        name='application'
+        value={ticket.application}
+        onChange={handleChange}
+        className='form-control'
+        required
+      >
+        <option value=''>Select application</option>
+        {TICKET_APPLICATIONS.map((application) => (
+          <option key={application} value={application}>
+            {application}
+          </option>
+        ))}
       </select>
 
       <label className='form-label' htmlFor='priority'>
@@ -151,13 +183,19 @@ const TicketForm = ({ onSubmit }) => {
       <label className='form-label' htmlFor='attachments'>
         Attachments
       </label>
-      <input
-        id='attachments'
-        type='file'
-        multiple
-        onChange={handleFileChange}
-        className='file-control'
-      />
+      <div className='upload-control'>
+        <input
+          id='attachments'
+          type='file'
+          multiple
+          onChange={handleFileChange}
+          className='file-input-hidden'
+        />
+        <label htmlFor='attachments' className='upload-btn'>
+          Upload Files
+        </label>
+        <p className='upload-file-hint'>{attachmentSummary}</p>
+      </div>
 
       <button type='submit' className='primary-action-btn form-submit-btn'>
         Submit

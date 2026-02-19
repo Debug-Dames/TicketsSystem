@@ -1,53 +1,28 @@
-// {
-//   "name": "tickets-system",
-//   "version": "0.0.0",
-//   "private": true,
-//   "type": "module",
-//   "scripts": {
-//     "dev": "vite",
-//     "build": "vite build",
-//     "preview": "vite preview",
-//     "lint": "eslint . --ext .js,.jsx"
-//   },
-//   "dependencies": {
-//     "react": "^19.2.0",
-//     "react-dom": "^19.2.0",
-//     "react-router-dom": "^6.16.0"
-//   },
-//   "devDependencies": {
-//     "@eslint/js": "^9.39.1",
-//     "@tailwindcss/postcss": "^4.1.18",
-//     "@vitejs/plugin-react": "^5.1.1",
-//     "autoprefixer": "^10.4.24",
-//     "eslint": "^9.39.1",
-//     "eslint-plugin-react-hooks": "^7.0.1",
-//     "postcss": "^8.5.6",
-//     "tailwindcss": "^4.1.18",
-//     "vite": "^7.3.1"
-//   }
-// }
-
 {
-  "name": "ticketssystem",
-  "version": "1.0.0",
-  "description": "��#\u0000 \u0000T\u0000i\u0000c\u0000k\u0000e\u0000t\u0000s\u0000S\u0000y\u0000s\u0000t\u0000e\u0000m\u0000\r\u0000 \u0000",
-  "main": "index.js",
+  "name": "tickets-system",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "lint": "eslint . --ext .js,.jsx"
   },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/Debug-Dames/TicketsSystem.git"
-  },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
-  "type": "commonjs",
-  "bugs": {
-    "url": "https://github.com/Debug-Dames/TicketsSystem/issues"
-  },
-  "homepage": "https://github.com/Debug-Dames/TicketsSystem#readme",
   "dependencies": {
-    "pg": "^8.18.0"
+    "react": "^19.2.0",
+    "react-dom": "^19.2.0",
+    "react-router-dom": "^6.16.0"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.39.1",
+    "@tailwindcss/postcss": "^4.1.18",
+    "@vitejs/plugin-react": "^5.1.1",
+    "autoprefixer": "^10.4.24",
+    "eslint": "^9.39.1",
+    "eslint-plugin-react-hooks": "^7.0.1",
+    "postcss": "^8.5.6",
+    "tailwindcss": "^4.1.18",
+    "vite": "^7.3.1"
   }
 }

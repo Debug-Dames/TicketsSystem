@@ -1,6 +1,7 @@
 import { useContext, useMemo } from 'react'
 import { NavLink, Outlet, useLocation, useNavigate } from 'react-router-dom'
 import { AuthContext } from '../context/AuthContext.jsx'
+import logo from '../assets/DebugDames-logo.png'
 import '../styles/layout.css'
 
 const NAV_ITEMS = [
@@ -15,7 +16,7 @@ const TITLES = {
   '/dashboard': 'Dashboard',
   '/user-dashboard': 'Dashboard',
   '/agent-dashboard': 'Dashboard',
-  '/my-tickets': 'My Tickets',
+  '/my-tickets': 'Tickets',
   '/create-ticket': 'Create Ticket',
   '/reports': 'Reports',
   '/settings': 'Profile & Settings',
@@ -26,11 +27,18 @@ function Layout() {
   const location = useLocation()
   const navigate = useNavigate()
 
-  const pageTitle = useMemo(() => TITLES[location.pathname] || 'Ticket System', [location.pathname])
-  const showPageHeader = location.pathname !== '/create-ticket'
+  const pageTitle = useMemo(() => {
+    if (location.pathname === '/my-tickets') {
+      return user?.role === 'agent' ? 'All Tickets' : 'My Tickets'
+    }
+    return TITLES[location.pathname] || 'Ticket System'
+  }, [location.pathname, user?.role])
   const navItems = useMemo(() => {
     if (user?.role === 'agent') {
-      return NAV_ITEMS.filter((item) => item.path !== '/create-ticket')
+      return NAV_ITEMS.filter((item) => item.path !== '/create-ticket').map((item) => {
+        if (item.path !== '/my-tickets') return item
+        return { ...item, label: 'All Tickets' }
+      })
     }
     return NAV_ITEMS
   }, [user?.role])
@@ -46,8 +54,14 @@ function Layout() {
     <div className='app-layout'>
       <aside className='app-sidebar'>
         <div className='sidebar-top'>
-          <p className='app-brand-kicker'>Tickets System</p>
-          <h2>Workspace</h2>
+          <div className='brand-row'>
+            <img src={logo} alt='Tickets logo' className='brand-logo' />
+            <div>
+              <p className='app-brand-kicker'>Tickets System</p>
+              <h2>Workspace</h2>
+            </div>
+          </div>
+          <p className='brand-copy'>Manage incidents, service requests, and updates in one place.</p>
         </div>
 
         <nav className='app-nav'>
@@ -66,11 +80,10 @@ function Layout() {
       </aside>
 
       <div className='app-main'>
-        {showPageHeader && (
-          <header className='app-header'>
-            <h1>{pageTitle}</h1>
-          </header>
-        )}
+        <header className='app-header'>
+          <img src={logo} alt='DebugDames logo' className='header-logo' />
+          <h1>{pageTitle}</h1>
+        </header>
         <section className='app-content'>
           <Outlet />
         </section>

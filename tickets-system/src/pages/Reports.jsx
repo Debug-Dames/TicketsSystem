@@ -33,7 +33,6 @@ function Reports() {
         <div className='dashboard-hero'>
           <div>
             <p className='dashboard-kicker'>Insights</p>
-            <h1>Reports</h1>
             <p className='dashboard-subtitle'>
               {user?.role === 'agent' ? 'Operational overview of all tickets.' : 'Summary of your ticket activity.'}
             </p>
