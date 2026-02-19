@@ -59,6 +59,40 @@ router.get("/my", auth, async (req, res) => {
 });
 
 
+//assign ticket to support (admin)
+router.put("/:id/assign", auth, role("support"), async (req, res) => {
+  const { assigned_to } = req.body;
+
+  try {
+    // Check assigned user exists AND is a support agent
+    const assignedUser = await pool.query(
+      "SELECT id FROM users WHERE id = $1 AND LOWER(role) = 'support'",
+      [assigned_to]
+    );
+
+    if (!assignedUser.rows.length) {
+      return res.status(400).json({ message: "Invalid support agent" });
+    }
+
+    // Update ticket
+    await pool.query(
+      `UPDATE tickets
+       SET assigned_to = $1,
+           status = 'in_progress',
+           updated_at = CURRENT_TIMESTAMP
+       WHERE id = $2`,
+      [assigned_to, req.params.id]
+    );
+
+    return res.json({ message: "Ticket assigned successfully" });
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({ message: "Server error" });
+  }
+});
+
+
+
 // SUPPORT: view all
 router.get("/", auth, role("support"), async (req, res) => {
   const result = await pool.query("SELECT * FROM tickets");
