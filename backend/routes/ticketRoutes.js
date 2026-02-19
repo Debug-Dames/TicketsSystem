@@ -50,12 +50,39 @@ router.post("/:ticketId/comment", auth, role("support"), async (req, res) => {
 
 // USER: view own tickets
 router.get("/my", auth, async (req, res) => {
-  const result = await pool.query(
-    "SELECT * FROM tickets WHERE user_id = $1",
-    [req.user.id]
-  );
+  const result = await pool.query(`
+  SELECT 
+    t.id,
+    t.user_id,
+    t.title,
+    t.description,
+    t.priority,
+    t.status,
+    t.created_at,
+    t.updated_at,
+    t.assigned_to,
+    assigned.name AS assigned_name,
+    COALESCE(
+      json_agg(
+        json_build_object(
+          'id', tc.id,
+          'user_id', tc.user_id,
+          'comment', tc.comment,
+          'created_at', tc.created_at
+        )
+      ) FILTER (WHERE tc.id IS NOT NULL),
+      '[]'
+    ) AS comments
+  FROM tickets t
+  LEFT JOIN ticket_comments tc ON tc.ticket_id = t.id
+  LEFT JOIN users assigned ON assigned.id = t.assigned_to
+  WHERE t.user_id = $1
+  GROUP BY t.id, assigned.name
+  ORDER BY t.created_at DESC
+`, [req.user.id]);
 
-  res.json(result.rows);
+res.json(result.rows);
+
 });
 
 
