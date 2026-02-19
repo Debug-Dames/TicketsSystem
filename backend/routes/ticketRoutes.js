@@ -19,6 +19,35 @@ router.post("/", auth, async (req, res) => {
 });
 
 
+// Add comment to ticket (support)
+router.post("/:ticketId/comment", auth, role("support"), async (req, res) => {
+  const { comment } = req.body;
+  const { ticketId } = req.params;
+
+  if (!comment) {
+    return res.status(400).json({ message: "Comment is required" });
+  }
+
+  // Insert into ticket_comments table
+  await pool.query(
+    `INSERT INTO ticket_comments (ticket_id, user_id, comment)
+     VALUES ($1, $2, $3)`,
+    [ticketId, req.user.id, comment]
+  );
+
+  // Update tickets.comment with latest comment
+  await pool.query(
+    `UPDATE tickets
+     SET comment = $1,
+         updated_at = CURRENT_TIMESTAMP
+     WHERE id = $2`,
+    [comment, ticketId]
+  );
+
+  res.json({ message: "Comment added successfully" });
+});
+
+
 // USER: view own tickets
 router.get("/my", auth, async (req, res) => {
   const result = await pool.query(
