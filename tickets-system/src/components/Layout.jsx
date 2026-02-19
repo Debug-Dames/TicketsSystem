@@ -1,7 +1,7 @@
 import { useContext, useMemo } from 'react'
 import { NavLink, Outlet, useLocation, useNavigate } from 'react-router-dom'
 import { AuthContext } from '../context/AuthContext.jsx'
-import logo from '../assets/react.svg'
+import logo from '../assets/DebugDames-logo.png'
 import '../styles/layout.css'
 
 const NAV_ITEMS = [
