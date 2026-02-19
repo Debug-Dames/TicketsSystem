@@ -2,11 +2,11 @@ const router = require("express").Router();
 const pool = require("../db/db");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
+const role = require("../middleware/role");
 
 // REGISTER
 router.post("/register", async (req, res) => {
-  const { name, email, password, role = "user" } = req.body;
-  
+  const { name, email, password, role } = req.body;
 
   try {
     const hashed = await bcrypt.hash(password, 10);
@@ -14,15 +14,29 @@ router.post("/register", async (req, res) => {
     const result = await pool.query(
       `INSERT INTO users (name, email, password, role)
        VALUES ($1, $2, $3, $4)
-       RETURNING id`,
+       RETURNING id, name, email, role, created_at`,
       [name, email, hashed, role]
     );
 
-    res.json({ id: result.rows[0].id });
-    console.log("Login resp: ", res)
-    
+    const newUser = result.rows[0];
+
+    // Log for debugging
+    console.log("User registered:", newUser);
+
+    // Send structured response
+    res.status(201).json({
+      success: true,
+      message: "User registered successfully",
+      user: newUser,
+    });
   } catch (error) {
-    res.status(400).json({ message: "Email already exists" });
+    console.error("Register error:", error);
+
+    res.status(400).json({
+      success: false,
+      message: "Email already exists or registration failed",
+      error: error.message,
+    });
   }
 });
 
@@ -40,7 +54,10 @@ router.post("/login", async (req, res) => {
     const user = result.rows[0];
 
     if (!user || !(await bcrypt.compare(password, user.password))) {
-      return res.status(400).json({ message: "Invalid credentials" });
+      return res.status(400).json({
+        success: false,
+        message: "Invalid credentials",
+      });
     }
 
     const token = jwt.sign(
@@ -49,11 +66,25 @@ router.post("/login", async (req, res) => {
       { expiresIn: "1d" }
     );
 
-    res.json({ token, user });
-    console.log('Resp :', res)
+    // Remove sensitive fields before sending
+    const { password: _, ...safeUser } = user;
+
+    // Log for debugging
+    console.log("Login successful:", safeUser);
+
+    res.status(200).json({
+      success: true,
+      message: "Login successful",
+      token,
+      user: safeUser,
+    });
   } catch (error) {
-    console.log('Resp :', error)
-    res.status(500).json({ message: "Server error" });
+    console.error("Login error:", error);
+    res.status(500).json({
+      success: false,
+      message: "Server error",
+      error: error.message,
+    });
   }
 });
 
