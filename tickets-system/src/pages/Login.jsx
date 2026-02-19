@@ -1,6 +1,7 @@
 import { useContext, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { AuthContext } from '../context/AuthContext.jsx'
+import logo from '../assets/react.svg'
 import '../styles/login.css'
 
 function Login() {
@@ -36,6 +37,7 @@ function Login() {
     <div className='login-container'>
       <div className='auth-shell'>
         <section className='auth-aside'>
+          <img src={logo} alt='DebugDames logo' className='auth-logo-large' />
           <p className='auth-kicker'>Tickets System</p>
           <h2>Support Flow Reimagined</h2>
           <p>
@@ -78,9 +80,10 @@ function Login() {
               <button
                 type='button'
                 className='input-action-button'
+                aria-label={showPassword ? 'Hide password' : 'Show password'}
                 onClick={() => setShowPassword((current) => !current)}
               >
-                {showPassword ? 'Hide' : 'Show'}
+                <span className={`password-toggle-icon${showPassword ? ' is-visible' : ''}`} aria-hidden='true' />
               </button>
             </div>
           </div>

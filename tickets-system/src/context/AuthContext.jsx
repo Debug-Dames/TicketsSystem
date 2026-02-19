@@ -1,4 +1,5 @@
 import { createContext, useMemo, useState } from 'react'
+import { getTickets, saveTickets } from '../utils/ticketsStore'
 
 const USERS_KEY = 'ts_users'
 const CURRENT_USER_KEY = 'ts_current_user'
@@ -109,6 +110,50 @@ export function AuthProvider({ children }) {
     return { ok: true }
   }
 
+  const updateEmail = ({ email }) => {
+    if (!user) return { ok: false, error: 'No active user session.' }
+
+    const normalizedEmail = email.trim().toLowerCase()
+    if (!normalizedEmail) return { ok: false, error: 'Please provide an email address.' }
+
+    const users = readJson(USERS_KEY, [])
+    const emailExists = users.some((item) => item.email === normalizedEmail && item.id !== user.id)
+    if (emailExists) return { ok: false, error: 'Email already registered.' }
+
+    const userIndex = users.findIndex((item) => item.id === user.id)
+    if (userIndex === -1) return { ok: false, error: 'User account not found.' }
+
+    const previousEmail = user.email
+    const updatedUsers = [...users]
+    updatedUsers[userIndex] = {
+      ...updatedUsers[userIndex],
+      email: normalizedEmail,
+    }
+    localStorage.setItem(USERS_KEY, JSON.stringify(updatedUsers))
+
+    const updatedSession = {
+      ...user,
+      email: normalizedEmail,
+    }
+    setUser(updatedSession)
+    localStorage.setItem(CURRENT_USER_KEY, JSON.stringify(updatedSession))
+
+    const updatedTickets = getTickets().map((ticket) => {
+      const updatedComments = (ticket.comments || []).map((comment) => {
+        if (comment.by !== previousEmail) return comment
+        return { ...comment, by: normalizedEmail }
+      })
+      return {
+        ...ticket,
+        createdBy: ticket.createdBy === previousEmail ? normalizedEmail : ticket.createdBy,
+        comments: updatedComments,
+      }
+    })
+    saveTickets(updatedTickets)
+
+    return { ok: true, user: updatedSession }
+  }
+
   const value = useMemo(
     () => ({
       user,
@@ -116,6 +161,7 @@ export function AuthProvider({ children }) {
       login,
       logout,
       resetPassword,
+      updateEmail,
     }),
     [user],
   )

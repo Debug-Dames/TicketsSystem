@@ -33,12 +33,11 @@ function UserDashboard() {
         <div className='dashboard-hero'>
           <div>
             <p className='dashboard-kicker'>Welcome</p>
-            <h1>{user?.name ? `${user.name}'s Dashboard` : 'User Dashboard'}</h1>
             <p className='dashboard-subtitle'>Here is a quick view of your support activity.</p>
           </div>
         </div>
 
-        <section className='stats-grid'>
+        <section className='stats-grid dashboard-section'>
           <div className='stat-card'>
             <p className='stat-label'>Total Tickets</p>
             <p className='stat-value'>{stats.total}</p>
@@ -57,14 +56,13 @@ function UserDashboard() {
           </div>
         </section>
 
-        <section className='actions-row'>
+        <section className='actions-row dashboard-section'>
           <Link to='/create-ticket' className='primary-action-btn'>
             Create Ticket
           </Link>
         </section>
 
-        <section className='panel'>
-          <h2 className='section-title'>My Tickets</h2>
+        <section className='panel dashboard-section'>
           <TicketsTable tickets={myTickets} />
         </section>
       </section>

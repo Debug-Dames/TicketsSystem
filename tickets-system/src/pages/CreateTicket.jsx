@@ -10,11 +10,14 @@ const CreateTicket = () => {
   const navigate = useNavigate()
 
   const handleTicketSubmit = (ticket) => {
+    const requesterId = user?.id || `user-${crypto.randomUUID().slice(0, 8)}`
     const newTicket = {
       id: crypto.randomUUID(),
+      requesterId,
       title: ticket.title,
       description: ticket.description,
       category: ticket.category,
+      application: ticket.application,
       priority: ticket.priority,
       status: 'Open',
       createdBy: user?.email || '',
@@ -29,15 +32,20 @@ const CreateTicket = () => {
   }
 
   return (
-    <div className='create-ticket-page'>
-      <main className='create-ticket-container'>
+    <main className='dashboard-page'>
+      <section className='dashboard-card'>
+        <div className='dashboard-hero'>
+          <div>
+            <p className='dashboard-kicker'>Support</p>
+            <p className='dashboard-subtitle'>Capture issue details so support can resolve them faster.</p>
+          </div>
+        </div>
+
         <section className='panel create-ticket-panel'>
-          <h1 className='section-title'>Create Ticket</h1>
-          <p className='hero-copy'>Select a ticket title and description to submit faster.</p>
           <TicketForm onSubmit={handleTicketSubmit} />
         </section>
-      </main>
-    </div>
+      </section>
+    </main>
   )
 }
 

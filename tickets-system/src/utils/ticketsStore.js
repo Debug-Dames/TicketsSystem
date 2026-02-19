@@ -5,9 +5,11 @@ const TICKETS_BROADCAST_CHANNEL = 'tickets-sync'
 function normalizeTicket(ticket, index) {
   return {
     id: ticket?.id || `ticket-${index}-${Date.now()}`,
+    requesterId: ticket?.requesterId || '',
     title: ticket?.title || 'Untitled Ticket',
     description: ticket?.description || '',
     category: ticket?.category || 'General',
+    application: ticket?.application || 'Other',
     priority: ticket?.priority || 'Low',
     status: ticket?.status || 'Open',
     createdBy: ticket?.createdBy || '',
