@@ -1,0 +1,24 @@
+{
+  "name": "ticketssystem",
+  "version": "1.0.0",
+  "description": "��#\u0000 \u0000T\u0000i\u0000c\u0000k\u0000e\u0000t\u0000s\u0000S\u0000y\u0000s\u0000t\u0000e\u0000m\u0000\r\u0000 \u0000",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Debug-Dames/TicketsSystem.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/Debug-Dames/TicketsSystem/issues"
+  },
+  "homepage": "https://github.com/Debug-Dames/TicketsSystem#readme",
+  "dependencies": {
+    "pg": "^8.18.0"
+  }
+}

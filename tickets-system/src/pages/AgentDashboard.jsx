@@ -1,28 +1,19 @@
 import { useContext, useEffect, useMemo, useState } from 'react'
 import TicketsTable from '../components/TicketsTable.jsx'
 import { AuthContext } from '../context/AuthContext.jsx'
-import { TICKET_CATEGORIES, TICKET_TITLES } from '../data/ticketOptions'
 import { getTickets, saveTickets, subscribeTickets } from '../utils/ticketsStore'
 import '../styles/dashboard.css'
 import '../styles/tickets.css'
 
 function AgentDashboard() {
   const { user } = useContext(AuthContext)
-  const [titleFilter, setTitleFilter] = useState('all')
-  const [categoryFilter, setCategoryFilter] = useState('all')
   const [allTickets, setAllTickets] = useState(() => getTickets())
 
   useEffect(() => {
     return subscribeTickets(setAllTickets)
   }, [])
 
-  const visibleTickets = useMemo(() => {
-    return allTickets.filter((ticket) => {
-      const matchesTitle = titleFilter === 'all' || ticket.title === titleFilter
-      const matchesCategory = categoryFilter === 'all' || ticket.category === categoryFilter
-      return matchesTitle && matchesCategory
-    })
-  }, [allTickets, categoryFilter, titleFilter])
+  const visibleTickets = useMemo(() => allTickets, [allTickets])
   const openCount = useMemo(() => visibleTickets.filter((ticket) => ticket.status === 'Open').length, [visibleTickets])
   const inProgressCount = useMemo(
     () => visibleTickets.filter((ticket) => ticket.status === 'In Progress').length,
@@ -30,6 +21,14 @@ function AgentDashboard() {
   )
   const resolvedCount = useMemo(
     () => visibleTickets.filter((ticket) => ticket.status === 'Resolved').length,
+    [visibleTickets],
+  )
+  const highPriorityCount = useMemo(
+    () => visibleTickets.filter((ticket) => ticket.priority === 'High').length,
+    [visibleTickets],
+  )
+  const applicationsCount = useMemo(
+    () => new Set(visibleTickets.map((ticket) => ticket.application).filter(Boolean)).size,
     [visibleTickets],
   )
 
@@ -52,7 +51,6 @@ function AgentDashboard() {
         <div className='dashboard-hero'>
           <div>
             <p className='dashboard-kicker'>Operations</p>
-            <h1>Support Agent Dashboard</h1>
             <p className='dashboard-subtitle'>
               Monitor, update and resolve incoming support tickets. Support agents see all tickets on the agent
               dashboard.
@@ -77,35 +75,14 @@ function AgentDashboard() {
             <h3>Resolved</h3>
             <p>{resolvedCount}</p>
           </article>
-        </div>
-
-        <div className='dashboard-filters'>
-          <div>
-            <label htmlFor='titleFilter'>Title</label>
-            <select id='titleFilter' value={titleFilter} onChange={(event) => setTitleFilter(event.target.value)}>
-              <option value='all'>All titles</option>
-              {TICKET_TITLES.map((title) => (
-                <option key={title} value={title}>
-                  {title}
-                </option>
-              ))}
-            </select>
-          </div>
-          <div>
-            <label htmlFor='categoryFilter'>Category</label>
-            <select
-              id='categoryFilter'
-              value={categoryFilter}
-              onChange={(event) => setCategoryFilter(event.target.value)}
-            >
-              <option value='all'>All categories</option>
-              {TICKET_CATEGORIES.map((category) => (
-                <option key={category} value={category}>
-                  {category}
-                </option>
-              ))}
-            </select>
-          </div>
+          <article>
+            <h3>High Priority</h3>
+            <p>{highPriorityCount}</p>
+          </article>
+          <article>
+            <h3>Applications</h3>
+            <p>{applicationsCount}</p>
+          </article>
         </div>
 
         <TicketsTable tickets={visibleTickets} isAgent onStatusChange={handleStatusChange} />

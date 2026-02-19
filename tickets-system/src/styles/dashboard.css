@@ -1,4 +1,6 @@
 .dashboard-page {
+  width: 100%;
+  max-width: 100%;
   min-height: 100%;
   padding: 0;
 }
@@ -12,6 +14,7 @@
   padding: 36px;
   border: 1px solid #f5d0fe;
   box-shadow: 0 22px 40px rgba(126, 34, 206, 0.2);
+  box-sizing: border-box;
 }
 
 .dashboard-hero {
@@ -44,7 +47,7 @@
 
 .dashboard-stats {
   display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
   gap: 12px;
   margin: 20px 0 14px;
 }
@@ -259,6 +262,10 @@
   justify-content: flex-start;
 }
 
+.dashboard-section {
+  margin-top: 18px;
+}
+
 .primary-action-btn {
   display: inline-flex;
   align-items: center;
@@ -469,8 +476,8 @@
 }
 
 .create-ticket-panel {
-  max-width: 620px;
-  margin: 0 auto;
+  max-width: 100%;
+  margin: 16px 0 0;
   background: rgba(255, 255, 255, 0.97);
   border: 1px solid #eadcff;
   box-shadow: 0 10px 28px rgba(85, 44, 140, 0.12);
@@ -510,18 +517,82 @@
   resize: vertical;
 }
 
-.file-control {
-  width: 100%;
-  border: 1px solid #d9c7f3;
-  border-radius: 10px;
-  background: #fff;
-  color: #3d3158;
-  padding: 0.55rem 0.65rem;
+.upload-control {
   margin-bottom: 0.8rem;
+}
+
+.file-input-hidden {
+  position: absolute;
+  opacity: 0;
+  width: 0.1px;
+  height: 0.1px;
+  overflow: hidden;
+}
+
+.upload-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+  border: 1px solid #d8b4fe;
+  border-radius: 999px;
+  padding: 0.55rem 0.95rem;
+  background: linear-gradient(135deg, #fdf4ff, #fae8ff);
+  color: #7e22ce;
   font-size: 0.86rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: transform 0.16s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+}
+
+.upload-btn::before {
+  content: '+';
+  font-size: 1rem;
+  line-height: 1;
+}
+
+.upload-btn:hover {
+  transform: translateY(-1px);
+  border-color: #c084fc;
+  box-shadow: 0 8px 18px rgba(168, 85, 247, 0.2);
+}
+
+.upload-file-hint {
+  margin: 0.5rem 0 0;
+  font-size: 0.82rem;
+  color: #6b21a8;
 }
 
 .form-submit-btn {
   border: none;
   cursor: pointer;
+}
+
+.settings-grid .profile-value {
+  font-size: 1.04rem;
+  font-weight: 700;
+}
+
+.profile-email {
+  white-space: normal;
+  overflow-wrap: anywhere;
+  word-break: break-word;
+}
+
+.settings-form {
+  margin-top: 18px;
+  max-width: 520px;
+}
+
+.settings-form label {
+  display: block;
+  margin-bottom: 6px;
+  color: #701a75;
+  font-weight: 700;
+}
+
+.settings-feedback {
+  margin: 8px 0 0;
+  color: #7e22ce;
+  font-size: 0.9rem;
 }
