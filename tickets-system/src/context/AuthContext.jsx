@@ -5,6 +5,7 @@ export const AuthContext = createContext(null);
 
 export function AuthProvider({ children }) {
   const [user, setUser] = useState(null);
+  const [loading, setLoading] = useState(true); 
 
   // ✅ LOAD USER FROM LOCALSTORAGE ON START
   useEffect(() => {
@@ -12,6 +13,7 @@ export function AuthProvider({ children }) {
     if (storedUser) {
       setUser(JSON.parse(storedUser));
     }
+    setLoading(false);
   }, []);
 
   const register = async ({ name, email, password, role }) => {
@@ -37,7 +39,8 @@ export function AuthProvider({ children }) {
     localStorage.removeItem("ts_current_user");
   };
 
-  const value = useMemo(() => ({ user, register, login, logout }), [user]);
+  const value = useMemo(() => ({ user, loading, register, login, logout }), [user, loading]);
+  
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 }

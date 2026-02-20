@@ -46,7 +46,7 @@ function AgentDashboard() {
           createdAt: ticket.created_at,
         }));
 
-        setAllTickets(result.tickets);
+        setAllTickets(formattedTickets);
       }
     }
 

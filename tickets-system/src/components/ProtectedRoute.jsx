@@ -3,15 +3,14 @@ import { Navigate } from 'react-router-dom'
 import { AuthContext } from '../context/AuthContext'
 
 const ProtectedRoute = ({ children, role }) => {
-  const { user } = useContext(AuthContext)
+  const { user, loading } = useContext(AuthContext)
 
-  // if (!user) return <Navigate to='/login' replace />
-  // if (role && user.role !== role) return <Navigate to='/dashboard' replace />
 
-  // If a role is required and doesn't match, redirect to the correct dashboard
-  
+  if (loading) {
+    return <div>Loading...</div>; // or your loader component
+  }
 
-  // 🔥 If user not loaded yet, don't render anything
+
   if (!user) {
     return <Navigate to="/login" replace />;
   }
@@ -24,6 +23,8 @@ const ProtectedRoute = ({ children, role }) => {
       />
     );
   }
+  console.log("Auth user:", user);
+  console.log("Loading:", loading);
 
 
   return children
