@@ -6,6 +6,43 @@ import { getAllTickets, updateTicketStatus, addTicketComment } from '../services
 import '../styles/dashboard.css'
 import '../styles/tickets.css'
 
+
+function formatTickets(tickets) {
+  return tickets.map((ticket) => ({
+    id: ticket.id,
+    requesterId: ticket.user_id,
+    title: ticket.title,
+    description: ticket.description,
+    priority:
+      ticket.priority?.toLowerCase() === "high"
+        ? "High"
+        : ticket.priority?.toLowerCase() === "medium"
+        ? "Medium"
+        : "Low",
+    status:
+      ticket.status === "in_progress"
+        ? "In Progress"
+        : ticket.status === "Open"
+        ? "Open"
+        : ticket.status === "Resolved"
+        ? "Resolved"
+        : ticket.status,
+    createdBy: ticket.user_id,
+    assignedTo: ticket.assigned_to || "Unassigned",
+    comments: ticket.comment
+      ? [
+          {
+            by: "Agent",
+            text: ticket.comment,
+            at: ticket.updated_at,
+          },
+        ]
+      : [],
+    createdAt: ticket.created_at,
+  }));
+}
+
+
 function AgentDashboard() {
   const { user } = useContext(AuthContext)
   const [allTickets, setAllTickets] = useState(() => getTickets())
@@ -19,34 +56,34 @@ function AgentDashboard() {
       const result = await getAllTickets(user.token);
 
       if (result.success) {
-        const formattedTickets = result.tickets.map((ticket) => ({
-          id: ticket.id,
-          requesterId: ticket.user_id,
-          title: ticket.title,
-          description: ticket.description,
-          priority:
-            ticket.priority?.toLowerCase() === "high"
-              ? "High"
-              : ticket.priority?.toLowerCase() === "medium"
-              ? "Medium"
-              : "Low",
-          status:
-            ticket.status === "in_progress"
-              ? "In Progress"
-              : ticket.status === "Open"
-              ? "Open"
-              : ticket.status === "Resolved"
-              ? "Resolved"
-              : ticket.status,
-          createdBy: ticket.user_id,
-          assignedTo: ticket.assigned_to || "Unassigned",
-          comments: ticket.comment
-            ? [{ by: "Agent", text: ticket.comment }]
-            : [],
-          createdAt: ticket.created_at,
-        }));
+        // const formattedTickets = result.tickets.map((ticket) => ({
+        //   id: ticket.id,
+        //   requesterId: ticket.user_id,
+        //   title: ticket.title,
+        //   description: ticket.description,
+        //   priority:
+        //     ticket.priority?.toLowerCase() === "high"
+        //       ? "High"
+        //       : ticket.priority?.toLowerCase() === "medium"
+        //       ? "Medium"
+        //       : "Low",
+        //   status:
+        //     ticket.status === "in_progress"
+        //       ? "In Progress"
+        //       : ticket.status === "Open"
+        //       ? "Open"
+        //       : ticket.status === "Resolved"
+        //       ? "Resolved"
+        //       : ticket.status,
+        //   createdBy: ticket.user_id,
+        //   assignedTo: ticket.assigned_to || "Unassigned",
+        //   comments: ticket.comment
+        //     ? [{ by: "Agent", text: ticket.comment }]
+        //     : [],
+        //   createdAt: ticket.created_at,
+        // }));
 
-        setAllTickets(formattedTickets);
+        setAllTickets(formatTickets(result.tickets));
       }
     }
 
@@ -89,22 +126,20 @@ function AgentDashboard() {
   // }
 
   const handleStatusChange = async (ticketId, status, comment) => {
-    // Update status
-    const statusResult = await updateTicketStatus(ticketId, status, user.token);
-    if (statusResult.success) {
-      setAllTickets((current) =>
-        current.map((t) => (t.id === ticketId ? statusResult.ticket : t))
-      );
-    }
+  // Update status first
+  await updateTicketStatus(ticketId, status, user.token);
 
-    // Add comment if provided
-    if (comment?.trim()) {
-      await addTicketComment(ticketId, comment, user.token);
-      // Refresh tickets after comment
-      const refreshed = await getAllTickets(user.token);
-      if (refreshed.success) setAllTickets(refreshed.tickets);
-    }
-  };
+  // Add comment if provided
+  if (comment?.trim()) {
+    await addTicketComment(ticketId, comment, user.token);
+  }
+
+  // Always refresh and format after changes
+  const refreshed = await getAllTickets(user.token);
+  if (refreshed.success) {
+    setAllTickets(formatTickets(refreshed.tickets));
+  }
+};
 
 
   return (
