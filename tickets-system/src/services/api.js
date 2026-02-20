@@ -6,8 +6,10 @@ export async function registerUser({ name, email, password, role }) {
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ name, email, password, role }),
   });
-  console.log("Register request body:", req.body);
-  return res.json();
+
+  const data = await res.json();
+  console.log("Register response:", data); // optional debug
+  return data;
 }
 
 export async function loginUser({ email, password, role }) {

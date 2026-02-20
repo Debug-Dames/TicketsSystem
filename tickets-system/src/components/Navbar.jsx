@@ -4,7 +4,7 @@ import { AuthContext } from '../context/AuthContext.jsx'
 import '../styles/dashboard.css'
 
 function Navbar({ userType }) {
-  const { logout } = useContext(AuthContext)
+  const { user, logout } = useContext(AuthContext)
   const navigate = useNavigate()
 
   const handleLogout = () => {
@@ -17,10 +17,13 @@ function Navbar({ userType }) {
       <div className='app-navbar-inner'>
         <h1 className='app-navbar-title'>Debug Dames Ticketing System</h1>
         <div className='app-navbar-links'>
-          <Link to='/dashboard' className='app-nav-link'>
+          <Link
+            to={user?.role === "support" ? "/agent-dashboard" : "/user-dashboard"}
+            className='app-nav-link'
+          >
             Home
           </Link>
-          {userType === 'user' && (
+          {user?.role === 'user' && (
             <>
               <Link to='/create-ticket' className='app-nav-link'>
                 Create Ticket
@@ -30,7 +33,7 @@ function Navbar({ userType }) {
               </Link>
             </>
           )}
-          {userType === 'agent' && (
+          {user?.role === 'support' && (
             <Link to='/agent-dashboard' className='app-nav-link'>
               All Tickets
             </Link>
