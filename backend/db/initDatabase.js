@@ -1,5 +1,6 @@
 const pool = require('./db');
 
+
 const createTables = async () => {
   try {
     await pool.query(`
