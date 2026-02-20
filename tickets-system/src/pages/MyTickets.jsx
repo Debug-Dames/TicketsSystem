@@ -15,14 +15,14 @@ function MyTickets() {
 
   const visibleTickets = useMemo(() => {
     if (!user) return []
-    if (user.role === 'agent') {
+    if (user.role === 'support') {
       return allTickets.filter((ticket) => Boolean(ticket.createdBy))
     }
     return allTickets.filter((ticket) => ticket.createdBy === user.email)
   }, [allTickets, user])
 
   const handleStatusChange = (ticketId, status, comment) => {
-    if (user?.role !== 'agent') return
+    if (user?.role !== 'support') return
 
     const cleanComment = comment?.trim()
     const updated = allTickets.map((ticket) => {
@@ -44,14 +44,14 @@ function MyTickets() {
           <div>
             <p className='dashboard-kicker'>Tickets</p>
             <p className='dashboard-subtitle'>
-              {user?.role === 'agent'
+              {user?.role === 'support'
                 ? 'Tickets created by users.'
                 : 'Tickets you have submitted and their status.'}
             </p>
           </div>
         </div>
 
-        <TicketsTable tickets={visibleTickets} isAgent={user?.role === 'agent'} onStatusChange={handleStatusChange} />
+        <TicketsTable tickets={visibleTickets} isAgent={user?.role === 'support'} onStatusChange={handleStatusChange} />
       </section>
     </main>
   )

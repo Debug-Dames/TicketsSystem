@@ -19,6 +19,38 @@ export async function loginUser({ email, password, role }) {
   return res.json();
 }
 
+
+export async function getAllTickets(token) {
+  const res = await fetch(`${API_URL}/tickets`, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  return res.json();
+}
+
+export async function updateTicketStatus(ticketId, status, token) {
+  const res = await fetch(`${API_URL}/tickets/${ticketId}/status`, {
+    method: "PUT",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
+    },
+    body: JSON.stringify({ status }),
+  });
+  return res.json();
+}
+
+export async function addTicketComment(ticketId, comment, token) {
+  const res = await fetch(`${API_URL}/tickets/${ticketId}/comment`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
+    },
+    body: JSON.stringify({ comment }),
+  });
+  return res.json();
+}
+
 export async function getTickets(token) {
   const res = await fetch(`${API_URL}/tickets/my`, {
     headers: { Authorization: `Bearer ${token}` },

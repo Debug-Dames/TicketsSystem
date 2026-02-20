@@ -9,6 +9,13 @@ const ProtectedRoute = ({ children, role }) => {
   // if (role && user.role !== role) return <Navigate to='/dashboard' replace />
 
   // If a role is required and doesn't match, redirect to the correct dashboard
+  
+
+  // 🔥 If user not loaded yet, don't render anything
+  if (!user) {
+    return <Navigate to="/login" replace />;
+  }
+
   if (role && user.role !== role) {
     return (
       <Navigate
