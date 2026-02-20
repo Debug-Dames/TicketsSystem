@@ -23,7 +23,7 @@ const createTables = async () => {
         status VARCHAR(20) DEFAULT 'open',
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
         updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-      );
+     
     `);
 
     await pool.query(`
