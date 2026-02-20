@@ -10,7 +10,7 @@ const createTables = async () => {
         password TEXT NOT NULL,
         role VARCHAR(20) NOT NULL,
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-      );
+      
     `);
 
     await pool.query(`
@@ -46,7 +46,7 @@ const createTables = async () => {
             user_id INTEGER REFERENCES users(id) ON DELETE CASCADE,
             comment TEXT NOT NULL,
             created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-        );
+       
         `);
 
     console.log("Tables created successfully");
