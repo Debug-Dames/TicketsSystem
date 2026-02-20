@@ -2,16 +2,96 @@ import { useContext, useEffect, useMemo, useState } from 'react'
 import TicketsTable from '../components/TicketsTable.jsx'
 import { AuthContext } from '../context/AuthContext.jsx'
 import { getTickets, saveTickets, subscribeTickets } from '../utils/ticketsStore'
+import { getAllTickets, updateTicketStatus, addTicketComment } from '../services/api.js'
 import '../styles/dashboard.css'
 import '../styles/tickets.css'
+
+
+function formatTickets(tickets) {
+  return tickets.map((ticket) => ({
+    id: ticket.id,
+    requesterId: ticket.user_id,
+    title: ticket.title,
+    description: ticket.description,
+    priority:
+      ticket.priority?.toLowerCase() === "high"
+        ? "High"
+        : ticket.priority?.toLowerCase() === "medium"
+        ? "Medium"
+        : "Low",
+    status:
+      ticket.status === "in_progress"
+        ? "In Progress"
+        : ticket.status === "Open"
+        ? "Open"
+        : ticket.status === "Resolved"
+        ? "Resolved"
+        : ticket.status,
+    createdBy: ticket.user_id,
+    assignedTo: ticket.assigned_to || "Unassigned",
+    comments: ticket.comment
+      ? [
+          {
+            by: "Agent",
+            text: ticket.comment,
+            at: ticket.updated_at,
+          },
+        ]
+      : [],
+    createdAt: ticket.created_at,
+  }));
+}
+
 
 function AgentDashboard() {
   const { user } = useContext(AuthContext)
   const [allTickets, setAllTickets] = useState(() => getTickets())
 
+//Fetch tickets from backend on mount  
   useEffect(() => {
-    return subscribeTickets(setAllTickets)
-  }, [])
+    if (!user?.token) return;
+
+    async function fetchTickets() {
+      
+      const result = await getAllTickets(user.token);
+
+      if (result.success) {
+        // const formattedTickets = result.tickets.map((ticket) => ({
+        //   id: ticket.id,
+        //   requesterId: ticket.user_id,
+        //   title: ticket.title,
+        //   description: ticket.description,
+        //   priority:
+        //     ticket.priority?.toLowerCase() === "high"
+        //       ? "High"
+        //       : ticket.priority?.toLowerCase() === "medium"
+        //       ? "Medium"
+        //       : "Low",
+        //   status:
+        //     ticket.status === "in_progress"
+        //       ? "In Progress"
+        //       : ticket.status === "Open"
+        //       ? "Open"
+        //       : ticket.status === "Resolved"
+        //       ? "Resolved"
+        //       : ticket.status,
+        //   createdBy: ticket.user_id,
+        //   assignedTo: ticket.assigned_to || "Unassigned",
+        //   comments: ticket.comment
+        //     ? [{ by: "Agent", text: ticket.comment }]
+        //     : [],
+        //   createdAt: ticket.created_at,
+        // }));
+
+        setAllTickets(formatTickets(result.tickets));
+      }
+    }
+
+  fetchTickets();
+}, [user]);
+
+
+
 
   const visibleTickets = useMemo(() => allTickets, [allTickets])
   const openCount = useMemo(() => visibleTickets.filter((ticket) => ticket.status === 'Open').length, [visibleTickets])
@@ -32,25 +112,42 @@ function AgentDashboard() {
     [visibleTickets],
   )
 
-  const handleStatusChange = (ticketId, status, comment) => {
-    const cleanComment = comment?.trim()
-    const updated = allTickets.map((ticket) => {
-      if (ticket.id !== ticketId) return ticket
-      const nextComments = cleanComment
-        ? [...(ticket.comments || []), { by: user.email, text: cleanComment, at: new Date().toISOString() }]
-        : ticket.comments || []
-      return { ...ticket, status, comments: nextComments }
-    })
-    setAllTickets(updated)
-    saveTickets(updated)
+  // const handleStatusChange = (ticketId, status, comment) => {
+  //   const cleanComment = comment?.trim()
+  //   const updated = allTickets.map((ticket) => {
+  //     if (ticket.id !== ticketId) return ticket
+  //     const nextComments = cleanComment
+  //       ? [...(ticket.comments || []), { by: user.email, text: cleanComment, at: new Date().toISOString() }]
+  //       : ticket.comments || []
+  //     return { ...ticket, status, comments: nextComments }
+  //   })
+  //   setAllTickets(updated)
+  //   saveTickets(updated)
+  // }
+
+  const handleStatusChange = async (ticketId, status, comment) => {
+  // Update status first
+  await updateTicketStatus(ticketId, status, user.token);
+
+  // Add comment if provided
+  if (comment?.trim()) {
+    await addTicketComment(ticketId, comment, user.token);
   }
+
+  // Always refresh and format after changes
+  const refreshed = await getAllTickets(user.token);
+  if (refreshed.success) {
+    setAllTickets(formatTickets(refreshed.tickets));
+  }
+};
+
 
   return (
     <main className='dashboard-page'>
       <section className='dashboard-card'>
         <div className='dashboard-hero'>
           <div>
-            <p className='dashboard-kicker'>Operations</p>
+            <p className='dashboard-kicker'>Support Operations</p>
             <p className='dashboard-subtitle'>
               Monitor, update and resolve incoming support tickets. Support agents see all tickets on the agent
               dashboard.
@@ -85,7 +182,25 @@ function AgentDashboard() {
           </article>
         </div>
 
-        <TicketsTable tickets={visibleTickets} isAgent onStatusChange={handleStatusChange} />
+        <section className="panel dashboard-section">
+          <h2 className="section-title">All Tickets</h2>
+          <TicketsTable
+            tickets={visibleTickets}
+            isAgent
+            onStatusChange={handleStatusChange}
+          />
+        </section>
+
+        {/* Actions */}
+        <div className="dashboard-actions">
+          <button onClick={() => window.location.reload()}>
+            Refresh Tickets
+          </button>
+          <button>Export Report</button>
+        </div>
+
+
+        {/* <TicketsTable tickets={visibleTickets} isAgent onStatusChange={handleStatusChange} /> */}
       </section>
     </main>
   )

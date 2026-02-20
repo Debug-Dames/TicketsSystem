@@ -4,11 +4,13 @@ import StatusDropdown from './StatusDropdown.jsx'
 const SORT_FIELDS = [
   { value: 'createdAt', label: 'Created date' },
   { value: 'title', label: 'Title' },
-  { value: 'category', label: 'Category' },
-  { value: 'application', label: 'Application' },
   { value: 'priority', label: 'Priority' },
   { value: 'status', label: 'Status' },
 ]
+
+
+  // { value: 'category', label: 'Category' },
+  // { value: 'application', label: 'Application' },
 
 function TicketsTable({ tickets, isAgent, onStatusChange }) {
   const [draftStatus, setDraftStatus] = useState({})
@@ -16,8 +18,8 @@ function TicketsTable({ tickets, isAgent, onStatusChange }) {
   const [query, setQuery] = useState('')
   const [statusFilter, setStatusFilter] = useState('all')
   const [priorityFilter, setPriorityFilter] = useState('all')
-  const [categoryFilter, setCategoryFilter] = useState('all')
-  const [applicationFilter, setApplicationFilter] = useState('all')
+  // const [categoryFilter, setCategoryFilter] = useState('all')
+  // const [applicationFilter, setApplicationFilter] = useState('all')
   const [sortBy, setSortBy] = useState('createdAt')
   const [sortDirection, setSortDirection] = useState('desc')
   const [showControls, setShowControls] = useState(false)
@@ -38,8 +40,8 @@ function TicketsTable({ tickets, isAgent, onStatusChange }) {
       .filter((ticket) => {
         if (statusFilter !== 'all' && ticket.status !== statusFilter) return false
         if (priorityFilter !== 'all' && ticket.priority !== priorityFilter) return false
-        if (categoryFilter !== 'all' && ticket.category !== categoryFilter) return false
-        if (applicationFilter !== 'all' && ticket.application !== applicationFilter) return false
+        // if (categoryFilter !== 'all' && ticket.category !== categoryFilter) return false
+        // if (applicationFilter !== 'all' && ticket.application !== applicationFilter) return false
 
         if (!searchTerm) return true
 
@@ -47,8 +49,8 @@ function TicketsTable({ tickets, isAgent, onStatusChange }) {
           ticket.requesterId,
           ticket.title,
           ticket.description,
-          ticket.category,
-          ticket.application,
+          // ticket.category,
+          // ticket.application,
           ticket.priority,
           ticket.status,
           ticket.createdBy,
@@ -64,7 +66,7 @@ function TicketsTable({ tickets, isAgent, onStatusChange }) {
         if (aValue > bValue) return sortDirection === 'asc' ? 1 : -1
         return 0
       })
-  }, [applicationFilter, categoryFilter, priorityFilter, query, sortBy, sortDirection, statusFilter, tickets])
+  }, [ priorityFilter, query, sortBy, sortDirection, statusFilter, tickets])
 
   if (!tickets.length) {
     return <p className='tickets-empty'>No tickets found.</p>
@@ -116,7 +118,7 @@ function TicketsTable({ tickets, isAgent, onStatusChange }) {
             <option value='Medium'>Medium</option>
             <option value='High'>High</option>
           </select>
-          <select value={categoryFilter} onChange={(event) => setCategoryFilter(event.target.value)}>
+          {/* <select value={categoryFilter} onChange={(event) => setCategoryFilter(event.target.value)}>
             <option value='all'>All categories</option>
             {categoryOptions.map((category) => (
               <option key={category} value={category}>
@@ -131,7 +133,7 @@ function TicketsTable({ tickets, isAgent, onStatusChange }) {
                 {application}
               </option>
             ))}
-          </select>
+          </select> */}
           <select value={sortBy} onChange={(event) => setSortBy(event.target.value)}>
             {SORT_FIELDS.map((field) => (
               <option key={field.value} value={field.value}>
@@ -155,8 +157,8 @@ function TicketsTable({ tickets, isAgent, onStatusChange }) {
               <tr>
                 <th>User ID</th>
                 <th>Title</th>
-                <th>Category</th>
-                <th>Application</th>
+                {/* <th>Category</th>
+                <th>Application</th> */}
                 <th>Priority</th>
                 <th>Status</th>
                 <th>Created By</th>
@@ -170,8 +172,8 @@ function TicketsTable({ tickets, isAgent, onStatusChange }) {
                 <tr key={ticket.id}>
                   <td>{ticket.requesterId || '-'}</td>
                   <td>{ticket.title}</td>
-                  <td>{ticket.category}</td>
-                  <td>{ticket.application || '-'}</td>
+                  {/* <td>{ticket.category}</td>
+                  <td>{ticket.application || '-'}</td> */}
                   <td>
                     <span className={priorityClassName(ticket.priority)}>{ticket.priority}</span>
                   </td>
