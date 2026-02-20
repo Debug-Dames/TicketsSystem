@@ -2,30 +2,62 @@ import { useContext, useEffect, useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
 import TicketsTable from '../components/TicketsTable.jsx'
 import { AuthContext } from '../context/AuthContext.jsx'
-import { getTickets, subscribeTickets } from '../utils/ticketsStore'
+import { getTickets } from '../services/api'
 import '../styles/dashboard.css'
 import '../styles/tickets.css'
 
 function UserDashboard() {
   const { user } = useContext(AuthContext)
-  const [allTickets, setAllTickets] = useState(() => getTickets())
+  const [allTickets, setAllTickets] = useState([])
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState(null)
 
   useEffect(() => {
-    return subscribeTickets(setAllTickets)
-  }, [])
+    if (!user?.token) {
+      setAllTickets([])
+      setLoading(false)
+      return
+    }
+
+    let cancelled = false
+
+    const fetchTickets = async () => {
+      try {
+        const data = await getTickets(user.token)
+        // console.log('Tickets fetched:', data)
+        if (!cancelled) setAllTickets(Array.isArray(data.tickets) ? data.tickets : [])
+      } catch (err) {
+        // console.error('Failed to fetch tickets:', err)
+        if (!cancelled) setAllTickets([])
+        if (!cancelled) setError(err.message)
+      } finally {
+        if (!cancelled) setLoading(false)
+      }
+    }
+
+    fetchTickets()
+    const id = setInterval(fetchTickets, 5000)
+    return () => {
+      cancelled = true
+      clearInterval(id)
+    }
+  }, [user])
 
   const myTickets = useMemo(() => {
     if (!user) return []
-    return allTickets.filter((ticket) => ticket.createdBy === user.email)
+    return allTickets.filter((ticket) => ticket.user_id === user.id)
   }, [allTickets, user])
 
   const stats = useMemo(() => {
     const total = myTickets.length
-    const open = myTickets.filter((ticket) => ticket.status === 'Open').length
-    const inProgress = myTickets.filter((ticket) => ticket.status === 'In Progress').length
-    const resolved = myTickets.filter((ticket) => ticket.status === 'Resolved').length
+    const open = myTickets.filter((t) => t.status === 'Open').length
+    const inProgress = myTickets.filter((t) => t.status === 'In Progress').length
+    const resolved = myTickets.filter((t) => t.status === 'Resolved').length
     return { total, open, inProgress, resolved }
   }, [myTickets])
+
+  if (loading) return <p>Loading tickets...</p>
+  if (error) return <p className="error-message">Error: {error}</p>
 
   return (
     <main className='dashboard-page'>
