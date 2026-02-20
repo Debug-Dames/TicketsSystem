@@ -20,6 +20,19 @@ export async function loginUser({ email, password, role }) {
 }
 
 
+export async function createTicket(ticketData, token) {
+  const res = await fetch(`${API_URL}/tickets`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${token}`,
+    },
+    body: JSON.stringify(ticketData),
+  })
+  return res.json()
+}
+
+
 export async function getAllTickets(token) {
   const res = await fetch(`${API_URL}/tickets`, {
     headers: { Authorization: `Bearer ${token}` },
@@ -51,9 +64,24 @@ export async function addTicketComment(ticketId, comment, token) {
   return res.json();
 }
 
+// export async function getTickets(token) {
+//   const res = await fetch(`${API_URL}/tickets/my`, {
+//     headers: { Authorization: `Bearer ${token}` },
+//   });
+//   return res.json();
+// }
+
 export async function getTickets(token) {
   const res = await fetch(`${API_URL}/tickets/my`, {
     headers: { Authorization: `Bearer ${token}` },
-  });
-  return res.json();
+  })
+
+  if (!res.ok) {
+    const text = await res.text()
+    throw new Error(`Failed to fetch tickets: ${res.status} ${text}`)
+  }
+
+  const data = await res.json()
+  console.log('Fetched tickets:', data) // <- debug
+  return data
 }
