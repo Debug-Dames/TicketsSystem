@@ -65,7 +65,7 @@
 import { useContext, useEffect, useState } from 'react'
 import TicketsTable from '../components/TicketsTable.jsx'
 import { AuthContext } from '../context/AuthContext.jsx'
-import { getTickets } from '../services/api'
+import { getTickets, getAllTickets } from '../services/api'
 import '../styles/dashboard.css'
 import '../styles/tickets.css'
 
@@ -79,7 +79,13 @@ function MyTickets() {
       if (!user?.token) return
 
       try {
-        const data = await getTickets(user.token)
+        let data;
+        if (user?.role === 'support') {
+          data = await getAllTickets(user.token); // ✅ support sees all tickets
+        } else {
+          data = await getTickets(user.token);    // ✅ user sees only their tickets
+        }
+
 
         console.log("API tickets response:", data)
 
