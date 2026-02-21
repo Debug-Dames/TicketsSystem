@@ -97,7 +97,7 @@ function Login() {
                 Select role
               </option>
               <option value='user'>User</option>
-              <option value='agent'>Support Agent</option>
+              <option value='support'>Support Agent</option>
             </select>
           </div>
           {error && <p className='form-error'>{error}</p>}

@@ -1,170 +1,46 @@
-import { createContext, useMemo, useState } from 'react'
-import { getTickets, saveTickets } from '../utils/ticketsStore'
+import { createContext, useMemo, useState, useEffect } from "react";
+import { registerUser, loginUser } from "../services/api";
 
-const USERS_KEY = 'ts_users'
-const CURRENT_USER_KEY = 'ts_current_user'
-
-export const AuthContext = createContext(null)
-
-function readJson(key, fallback) {
-  const raw = localStorage.getItem(key)
-  if (!raw) return fallback
-
-  try {
-    return JSON.parse(raw)
-  } catch {
-    return fallback
-  }
-}
-
-async function hashPassword(password) {
-  const bytes = new TextEncoder().encode(password)
-  const digest = await crypto.subtle.digest('SHA-256', bytes)
-  return Array.from(new Uint8Array(digest))
-    .map((byte) => byte.toString(16).padStart(2, '0'))
-    .join('')
-}
+export const AuthContext = createContext(null);
 
 export function AuthProvider({ children }) {
-  const [user, setUser] = useState(() => readJson(CURRENT_USER_KEY, null))
+  const [user, setUser] = useState(null);
+  const [loading, setLoading] = useState(true); 
+
+  // ✅ LOAD USER FROM LOCALSTORAGE ON START
+  useEffect(() => {
+    const storedUser = localStorage.getItem("ts_current_user");
+    if (storedUser) {
+      setUser(JSON.parse(storedUser));
+    }
+    setLoading(false);
+  }, []);
 
   const register = async ({ name, email, password, role }) => {
-    const users = readJson(USERS_KEY, [])
-    const normalizedEmail = email.trim().toLowerCase()
+    const result = await registerUser({ name, email, password, role });
+    if (!result.success) return { ok: false, error: result.message };
+    return { ok: true };
+  };
 
-    if (!role) {
-      return { ok: false, error: 'Please select a role.' }
-    }
+  const login = async ({ email, password }) => {
+    const result = await loginUser({ email, password });
+    if (!result.success) return { ok: false, error: result.message };
 
-    const exists = users.some((item) => item.email === normalizedEmail)
+    const sessionUser = { ...result.user, token: result.token };
 
-    if (exists) {
-      return { ok: false, error: 'Email already registered.' }
-    }
+    setUser(sessionUser);
+    localStorage.setItem("ts_current_user", JSON.stringify(sessionUser));
 
-    const passwordHash = await hashPassword(password)
-    const newUser = {
-      id: crypto.randomUUID(),
-      name: name.trim(),
-      email: normalizedEmail,
-      passwordHash,
-      role,
-    }
-
-    localStorage.setItem(USERS_KEY, JSON.stringify([...users, newUser]))
-    return { ok: true }
-  }
-
-  const login = async ({ email, password, role }) => {
-    const users = readJson(USERS_KEY, [])
-    const normalizedEmail = email.trim().toLowerCase()
-    const passwordHash = await hashPassword(password)
-
-    if (!role) {
-      return { ok: false, error: 'Please select a role.' }
-    }
-
-    const matchedUser = users.find(
-      (item) => item.email === normalizedEmail && item.passwordHash === passwordHash && item.role === role,
-    )
-
-    if (!matchedUser) {
-      return { ok: false, error: 'Invalid credentials or role.' }
-    }
-
-    const sessionUser = {
-      id: matchedUser.id,
-      name: matchedUser.name,
-      email: matchedUser.email,
-      role: matchedUser.role,
-      sessionToken: crypto.randomUUID(),
-    }
-
-    setUser(sessionUser)
-    localStorage.setItem(CURRENT_USER_KEY, JSON.stringify(sessionUser))
-    return { ok: true, user: sessionUser }
-  }
+    return { ok: true, user: sessionUser };
+  };
 
   const logout = () => {
-    setUser(null)
-    localStorage.removeItem(CURRENT_USER_KEY)
-  }
+    setUser(null);
+    localStorage.removeItem("ts_current_user");
+  };
 
-  const resetPassword = async ({ email, password }) => {
-    const users = readJson(USERS_KEY, [])
-    const normalizedEmail = email.trim().toLowerCase()
-    const userIndex = users.findIndex((item) => item.email === normalizedEmail)
+  const value = useMemo(() => ({ user, loading, register, login, logout }), [user, loading]);
+  
 
-    if (userIndex === -1) {
-      return { ok: false, error: 'No account found for this email.' }
-    }
-
-    const passwordHash = await hashPassword(password)
-    const updatedUsers = [...users]
-    updatedUsers[userIndex] = {
-      ...updatedUsers[userIndex],
-      passwordHash,
-    }
-
-    localStorage.setItem(USERS_KEY, JSON.stringify(updatedUsers))
-    return { ok: true }
-  }
-
-  const updateEmail = ({ email }) => {
-    if (!user) return { ok: false, error: 'No active user session.' }
-
-    const normalizedEmail = email.trim().toLowerCase()
-    if (!normalizedEmail) return { ok: false, error: 'Please provide an email address.' }
-
-    const users = readJson(USERS_KEY, [])
-    const emailExists = users.some((item) => item.email === normalizedEmail && item.id !== user.id)
-    if (emailExists) return { ok: false, error: 'Email already registered.' }
-
-    const userIndex = users.findIndex((item) => item.id === user.id)
-    if (userIndex === -1) return { ok: false, error: 'User account not found.' }
-
-    const previousEmail = user.email
-    const updatedUsers = [...users]
-    updatedUsers[userIndex] = {
-      ...updatedUsers[userIndex],
-      email: normalizedEmail,
-    }
-    localStorage.setItem(USERS_KEY, JSON.stringify(updatedUsers))
-
-    const updatedSession = {
-      ...user,
-      email: normalizedEmail,
-    }
-    setUser(updatedSession)
-    localStorage.setItem(CURRENT_USER_KEY, JSON.stringify(updatedSession))
-
-    const updatedTickets = getTickets().map((ticket) => {
-      const updatedComments = (ticket.comments || []).map((comment) => {
-        if (comment.by !== previousEmail) return comment
-        return { ...comment, by: normalizedEmail }
-      })
-      return {
-        ...ticket,
-        createdBy: ticket.createdBy === previousEmail ? normalizedEmail : ticket.createdBy,
-        comments: updatedComments,
-      }
-    })
-    saveTickets(updatedTickets)
-
-    return { ok: true, user: updatedSession }
-  }
-
-  const value = useMemo(
-    () => ({
-      user,
-      register,
-      login,
-      logout,
-      resetPassword,
-      updateEmail,
-    }),
-    [user],
-  )
-
-  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>
+  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 }
