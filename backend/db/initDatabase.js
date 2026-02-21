@@ -1,33 +1,53 @@
-const db = require('./db');
+const pool = require('./db');
 
-db.serialize(() => {
-
-    db.run(`
-        CREATE TABLE IF NOT EXISTS users (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            name VARCHAR(100) NOT NULL,
-            email VARCHAR(150) NOT NULL UNIQUE,
-            password TEXT NOT NULL,
-            role VARCHAR(20) NOT NULL,
-            created_at DATETIME DEFAULT CURRENT_TIMESTAMP
-        )
+const createTables = async () => {
+  try {
+    await pool.query(`
+      CREATE TABLE IF NOT EXISTS users (
+        id SERIAL PRIMARY KEY,
+        name VARCHAR(100) NOT NULL,
+        email VARCHAR(150) UNIQUE NOT NULL,
+        password TEXT NOT NULL,
+        role VARCHAR(20) NOT NULL,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+      );
     `);
 
-    db.run(`
-        CREATE TABLE IF NOT EXISTS tickets (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            user_id INTEGER NOT NULL,
-            title TEXT NOT NULL,
-            description TEXT NOT NULL,
-            priority TEXT DEFAULT 'low',
-            status TEXT DEFAULT 'open',
-            created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-            updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-
-            FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
-        )
+    await pool.query(`
+      CREATE TABLE IF NOT EXISTS tickets (
+        id SERIAL PRIMARY KEY,
+        user_id INTEGER REFERENCES users(id) ON DELETE CASCADE,
+        title TEXT NOT NULL,
+        description TEXT NOT NULL,
+        priority VARCHAR(20) DEFAULT 'low',
+        status VARCHAR(20) DEFAULT 'open',
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+      );
     `);
-        
-});
 
-module.exports = db;
+    
+    await pool.query(`
+        ALTER TABLE tickets
+        ADD COLUMN IF NOT EXISTS assigned_to INTEGER
+        REFERENCES users(id)
+        ON DELETE SET NULL;
+        `);
+
+    await pool.query(`
+        CREATE TABLE IF NOT EXISTS ticket_comments (
+            id SERIAL PRIMARY KEY,
+            ticket_id INTEGER REFERENCES tickets(id) ON DELETE CASCADE,
+            user_id INTEGER REFERENCES users(id) ON DELETE CASCADE,
+            comment TEXT NOT NULL,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        );
+        `);
+
+    console.log("Tables created successfully");
+  } catch (error) {
+    console.error("Error creating tables:", error);
+  }
+};
+
+createTables();
