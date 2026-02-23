@@ -192,12 +192,12 @@ function AgentDashboard() {
         </section>
 
         {/* Actions */}
-        <div className="dashboard-actions">
+        {/* <div className="dashboard-actions">
           <button onClick={() => window.location.reload()}>
             Refresh Tickets
           </button>
           <button>Export Report</button>
-        </div>
+        </div> */}
 
 
         {/* <TicketsTable tickets={visibleTickets} isAgent onStatusChange={handleStatusChange} /> */}

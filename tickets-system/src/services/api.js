@@ -1,4 +1,4 @@
-const API_URL = "http://localhost:5000/api";
+const API_URL = "https://ticketssystembackend.onrender.com/api";
 
 export async function registerUser({ name, email, password, role }) {
   const res = await fetch(`${API_URL}/auth/register`, {
