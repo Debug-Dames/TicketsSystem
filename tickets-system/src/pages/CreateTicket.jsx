@@ -73,6 +73,7 @@ const CreateTicket = () => {
     setError(null)
 
     try {
+      const formData = new FormData();
       const payload = {
         title: ticket.title,
         description: ticket.description,
@@ -81,8 +82,12 @@ const CreateTicket = () => {
         priority: ticket.priority,
       }
 
+      ticket.attachments.forEach((file) => {
+        formData.append("attachments", file);
+      });
+
       // call backend
-      const res = await createTicket(payload, user.token)
+      const res = await createTicket(payload, user.token, formData)
 
       if (res.success) {
         alert('Ticket created successfully!')
