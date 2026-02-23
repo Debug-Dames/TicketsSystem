@@ -1,7 +1,9 @@
 import { useContext, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
-import { AuthContext } from '../context/AuthContext.jsx'
+import { useToast } from '../context/ToastContext.jsx'
 import logo from '../assets/DebugDames-logo.png'
+import Loader from '../components/Loader.jsx'
+import { AuthContext } from '../context/AuthContext.jsx'
 import '../styles/login.css'
 
 function Register() {
@@ -15,6 +17,8 @@ function Register() {
     role: '',
   })
   const [error, setError] = useState('')
+  const [loading, setLoading] = useState(false)
+  const { showSuccess, showError } = useToast()
 
   const handleChange = (event) => {
     const { name, value } = event.target
@@ -24,14 +28,20 @@ function Register() {
   const handleSubmit = async (event) => {
     event.preventDefault()
     setError('')
+    setLoading(true)
+    try {
+      const result = await register(form)
+      if (!result.ok) {
+        setError(result.error)
+        showError && showError(result.error)
+        return
+      }
 
-    const result = await register(form)
-    if (!result.ok) {
-      setError(result.error)
-      return
+      showSuccess && showSuccess('Account created — please log in')
+      navigate('/login')
+    } finally {
+      setLoading(false)
     }
-
-    navigate('/login')
   }
 
   return (
@@ -115,8 +125,8 @@ function Register() {
             </select>
           </div>
           {error && <p className='form-error'>{error}</p>}
-          <button type='submit' className='login-button'>
-            Register
+          <button type='submit' className='login-button' disabled={loading}>
+            {loading ? <span style={{display:'inline-flex',alignItems:'center',gap:8}}><Loader small />Registering...</span> : 'Register'}
           </button>
           <p className='auth-switch'>
             Already have an account? <Link to='/login'>Back to login</Link>

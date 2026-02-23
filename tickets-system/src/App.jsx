@@ -135,10 +135,13 @@ import Settings from './pages/Settings.jsx'
 import Login from './pages/Login.jsx'
 import Register from './pages/Register.jsx'
 import ForgotPassword from './pages/ForgotPassword.jsx'
+import { ToastProvider } from './context/ToastContext.jsx'
+import Toast from './components/Toast.jsx'
 
 function App() {
   return (
-    <Routes>
+    <ToastProvider>
+      <Routes>
       {/* Public routes */}
       <Route path="/" element={<Navigate to="/login" replace />} />
       <Route path="/login" element={<Login />} />
@@ -185,7 +188,9 @@ function App() {
 
       {/* Catch-all */}
       <Route path="*" element={<Navigate to="/login" replace />} />
-    </Routes>
+      </Routes>
+      <Toast />
+    </ToastProvider>
   )
 }
 

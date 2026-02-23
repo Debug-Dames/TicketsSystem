@@ -1,7 +1,9 @@
 import { useContext, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
-import { AuthContext } from '../context/AuthContext.jsx'
 import logo from '../assets/DebugDames-logo.png'
+import Loader from '../components/Loader.jsx'
+import { AuthContext } from '../context/AuthContext.jsx'
+import { useToast } from '../context/ToastContext.jsx'
 import '../styles/login.css'
 
 function Login() {
@@ -14,6 +16,8 @@ function Login() {
     role: '',
   })
   const [error, setError] = useState('')
+  const [loading, setLoading] = useState(false)
+  const { showSuccess, showError } = useToast()
 
   const handleChange = (event) => {
     const { name, value } = event.target
@@ -23,14 +27,19 @@ function Login() {
   const handleSubmit = async (event) => {
     event.preventDefault()
     setError('')
-
-    const result = await login(form)
-    if (!result.ok) {
-      setError(result.error)
-      return
+    setLoading(true)
+    try {
+      const result = await login(form)
+      if (!result.ok) {
+        setError(result.error)
+        showError && showError(result.error)
+        return
+      }
+      showSuccess && showSuccess('Welcome back')
+      navigate(result.user.role === 'user' ? '/user-dashboard' : '/agent-dashboard')
+    } finally {
+      setLoading(false)
     }
-
-    navigate(result.user.role === 'user' ? '/user-dashboard' : '/agent-dashboard')
   }
 
   return (
@@ -101,8 +110,8 @@ function Login() {
             </select>
           </div>
           {error && <p className='form-error'>{error}</p>}
-          <button type='submit' className='login-button'>
-            Log In
+          <button type='submit' className='login-button' disabled={loading}>
+            {loading ? <span style={{display:'inline-flex',alignItems:'center',gap:8}}><Loader small />Logging in...</span> : 'Log In'}
           </button>
           <p className='auth-switch'>
             No account? <Link to='/register'>Register here</Link>
