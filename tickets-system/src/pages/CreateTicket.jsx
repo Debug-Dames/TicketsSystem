@@ -58,6 +58,7 @@ import { useNavigate } from 'react-router-dom'
 import TicketForm from '../components/TicketForm.jsx'
 import { AuthContext } from '../context/AuthContext.jsx'
 import { createTicket } from '../services/api' // new API function
+import { useToast } from '../context/ToastContext.jsx'
 import '../styles/dashboard.css'
 
 const CreateTicket = () => {
@@ -65,6 +66,7 @@ const CreateTicket = () => {
   const navigate = useNavigate()
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState(null)
+  const { showSuccess, showError } = useToast()
 
   const handleTicketSubmit = async (ticket) => {
     if (!user?.token) return setError('You must be logged in to submit a ticket.')
@@ -73,6 +75,7 @@ const CreateTicket = () => {
     setError(null)
 
     try {
+      const formData = new FormData();
       const payload = {
         title: ticket.title,
         description: ticket.description,
@@ -81,18 +84,26 @@ const CreateTicket = () => {
         priority: ticket.priority,
       }
 
+      ticket.attachments.forEach((file) => {
+        formData.append("attachments", file);
+      });
+
       // call backend
-      const res = await createTicket(payload, user.token)
+      const res = await createTicket(payload, user.token, formData)
 
       if (res.success) {
-        alert('Ticket created successfully!')
+        showSuccess && showSuccess('Ticket created successfully!')
         navigate('/my-tickets') // go to ticket list
       } else {
-        setError(res.message || 'Failed to create ticket.')
+        const message = res.message || 'Failed to create ticket.'
+        setError(message)
+        showError && showError(message)
       }
     } catch (err) {
       console.error(err)
-      setError('Failed to create ticket. Please try again.')
+      const msg = 'Failed to create ticket. Please try again.'
+      setError(msg)
+      showError && showError(msg)
     } finally {
       setLoading(false)
     }

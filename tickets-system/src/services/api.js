@@ -22,16 +22,35 @@ export async function loginUser({ email, password, role }) {
 }
 
 
-export async function createTicket(ticketData, token) {
+// export async function createTicket(ticketData, token) {
+//   const res = await fetch(`${API_URL}/tickets`, {
+//     method: 'POST',
+//     headers: {
+//       // 'Content-Type': 'application/json',
+//       Authorization: `Bearer ${token}`,
+//     },
+//     body: FormData,
+//   })
+//   return res.json()
+// }
+
+
+export async function createTicket(payload, token, formData) {
+  formData.append("title", payload.title);
+  formData.append("description", payload.description);
+  formData.append("category", payload.category);
+  formData.append("application", payload.application);
+  formData.append("priority", payload.priority);
+
   const res = await fetch(`${API_URL}/tickets`, {
-    method: 'POST',
+    method: "POST",
     headers: {
-      'Content-Type': 'application/json',
       Authorization: `Bearer ${token}`,
     },
-    body: JSON.stringify(ticketData),
-  })
-  return res.json()
+    body: formData,
+  });
+
+  return res.json();
 }
 
 

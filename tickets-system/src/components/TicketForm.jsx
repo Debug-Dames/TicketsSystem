@@ -1,5 +1,6 @@
-import React, { useState } from 'react'
+import { useState } from 'react'
 import { TICKET_APPLICATIONS, TICKET_CATEGORIES, TICKET_TITLES } from '../data/ticketOptions'
+import Loader from './Loader'
 
 const ticketTemplates = [
   {
@@ -44,7 +45,7 @@ const ticketTemplates = [
   },
 ]
 
-const TicketForm = ({ onSubmit }) => {
+const TicketForm = ({ onSubmit, disabled = false }) => {
   const [ticket, setTicket] = useState({
     title: '',
     description: '',
@@ -197,8 +198,15 @@ const TicketForm = ({ onSubmit }) => {
         <p className='upload-file-hint'>{attachmentSummary}</p>
       </div>
 
-      <button type='submit' className='primary-action-btn form-submit-btn'>
-        Submit
+      <button type='submit' className='primary-action-btn form-submit-btn' disabled={disabled}>
+        {disabled ? (
+          <span style={{display:'inline-flex',alignItems:'center',gap:8}}>
+            <Loader small />
+            Submitting...
+          </span>
+        ) : (
+          'Submit'
+        )}
       </button>
     </form>
   )

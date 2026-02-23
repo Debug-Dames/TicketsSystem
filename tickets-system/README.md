@@ -1,16 +1,96 @@
-# React + Vite
+# Tickets System — Frontend
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+React + Vite client for the Tickets System. Provides the UI for authentication, ticket creation, and dashboard views.
 
-Currently, two official plugins are available:
+---
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+## Prerequisites
 
-## React Compiler
+- Node.js 18+ and npm
+- Backend server running (see [`../backend`](../backend/README.md))
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+---
 
-## Expanding the ESLint configuration
+## Install & Run
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+```bash
+cd tickets-system
+npm install
+npm run dev
+```
+
+App runs at: `http://localhost:5173`
+
+---
+
+## Features
+
+- **React 19 + Vite** with Hot Module Replacement
+- **Routing** via `react-router-dom`
+- **Auth flow** — login and register pages; session stored in `localStorage` under `ts_current_user`
+- **Dashboard** — fetches the authenticated user's tickets from `GET /api/tickets/my`
+
+---
+
+## Configuration
+
+The API base URL is defined in `src/services/api.js` (default: `http://localhost:5000/api`).
+
+To avoid editing source files when switching environments, consider adding a Vite environment variable:
+
+```env
+# tickets-system/.env
+VITE_API_URL=http://localhost:5000/api
+```
+
+Then reference it in `src/services/api.js`:
+
+```js
+const API_BASE = import.meta.env.VITE_API_URL ?? 'http://localhost:5000/api';
+```
+
+---
+
+## Auth
+
+On successful login, the backend returns a JWT token. The frontend stores it in `localStorage` as `ts_current_user` and attaches it to all subsequent requests via the `Authorization: Bearer <token>` header.
+
+---
+
+## Other Scripts
+
+**Production build:**
+```bash
+npm run build
+npm run preview
+```
+
+**Lint:**
+```bash
+npm run lint
+```
+
+---
+
+## Troubleshooting
+
+**Dashboard loads but shows no tickets:**
+- Confirm you are logged in — check `localStorage` for a `ts_current_user` entry.
+- Confirm the backend is running at `http://localhost:5000` (or update `src/services/api.js`).
+- Confirm `GET /api/tickets/my` returns `{ success: true, tickets: [...] }`.
+
+**Login/register fails with a network error:**
+- Check that the backend is running and accessible.
+- Check the browser console for CORS errors — the backend must allow requests from `http://localhost:5173`.
+
+---
+
+## Quick Reference
+
+```bash
+# Terminal 1 — Backend
+cd backend && npm run dev
+
+# Terminal 2 — Frontend
+cd tickets-system && npm run dev
+```

@@ -66,13 +66,16 @@ import { useContext, useEffect, useState } from 'react'
 import TicketsTable from '../components/TicketsTable.jsx'
 import { AuthContext } from '../context/AuthContext.jsx'
 import { getTickets, getAllTickets } from '../services/api'
+import { useToast } from '../context/ToastContext.jsx'
 import '../styles/dashboard.css'
 import '../styles/tickets.css'
+import Loader from '../components/Loader.jsx'
 
 function MyTickets() {
   const { user } = useContext(AuthContext)
   const [tickets, setTickets] = useState([])
   const [loading, setLoading] = useState(true)
+  const { showError } = useToast()
 
   useEffect(() => {
     const fetchTickets = async () => {
@@ -93,6 +96,7 @@ function MyTickets() {
         setTickets(data.tickets || [])
       } catch (err) {
         console.error("Failed to load tickets:", err)
+        showError && showError(err.message || 'Failed to load tickets')
       } finally {
         setLoading(false)
       }
@@ -102,7 +106,7 @@ function MyTickets() {
   }, [user])
 
   if (loading) {
-    return <div>Loading tickets...</div>
+    return <Loader message="Loading tickets..." />
   }
 
   return (

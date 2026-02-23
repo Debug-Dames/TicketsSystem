@@ -11,7 +11,7 @@ const createTables = async () => {
         password TEXT NOT NULL,
         role VARCHAR(20) NOT NULL,
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-      
+      )
     `);
 
     await pool.query(`
@@ -24,7 +24,7 @@ const createTables = async () => {
         status VARCHAR(20) DEFAULT 'open',
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
         updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-     
+      )
     `);
 
     await pool.query(`
@@ -38,7 +38,18 @@ const createTables = async () => {
         ADD COLUMN IF NOT EXISTS assigned_to INTEGER
         REFERENCES users(id)
         ON DELETE SET NULL;
-        `); 
+    `); 
+
+
+    await pool.query(`
+    CREATE TABLE IF NOT EXISTS ticket_attachments (
+      id SERIAL PRIMARY KEY,
+      ticket_id INTEGER REFERENCES tickets(id) ON DELETE CASCADE,
+      file_path TEXT NOT NULL,
+      uploaded_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    )
+`);
+
 
     await pool.query(`
         CREATE TABLE IF NOT EXISTS ticket_comments (
@@ -47,8 +58,8 @@ const createTables = async () => {
             user_id INTEGER REFERENCES users(id) ON DELETE CASCADE,
             comment TEXT NOT NULL,
             created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-       
-        `);
+        )
+            `);
 
     console.log("Tables created successfully");
   } catch (error) {
@@ -56,4 +67,6 @@ const createTables = async () => {
   }
 };
 
-createTables();
+// createTables();
+
+module.exports = createTables;

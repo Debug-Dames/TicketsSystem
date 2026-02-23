@@ -2,16 +2,21 @@ const router = require("express").Router();
 const pool = require("../db/db");
 const auth = require("../middleware/auth");
 const role = require("../middleware/role");
+const multer = require("multer");
+const upload = multer({ dest: "uploads/" }); // or configure diskStorage
 
 // CREATE TICKET (user)
-router.post("/", auth, async (req, res) => {
+router.post("/", auth, upload.array("attachments"), async (req, res) => {
   const { title, description, priority } = req.body;
+  // Multer adds files to req.files
+  const files = req.files || []; // array of uploaded files
+  // const filePaths = files?.map(f => f.path) || [];
 
   try {
     const result = await pool.query(
       `INSERT INTO tickets (title, description, priority, user_id)
        VALUES ($1, $2, $3, $4)
-       RETURNING id, title, description, priority, status, created_at, updated_at`,
+       RETURNING *`,
       [title, description, priority, req.user.id]
     );
 
@@ -19,6 +24,14 @@ router.post("/", auth, async (req, res) => {
 
     // Log the response for debugging
     console.log("New ticket created:", ticket);
+
+    for (let file of files) {
+      await pool.query(
+        `INSERT INTO ticket_attachments (ticket_id, file_path)
+         VALUES ($1, $2)`,
+        [ticket.id, file.path]
+      );
+    }
 
     // Send a structured JSON response
     res.status(201).json({
@@ -105,6 +118,15 @@ router.get("/my", auth, async (req, res) => {
         assigned.name AS assigned_name,
         COALESCE(
           json_agg(
+            jsonb_build_object(
+              'id', ta.id,
+              'file_path', ta.file_path
+            )
+          ) FILTER (WHERE ta.id IS NOT NULL),
+          '[]'
+        ) AS attachments,
+        COALESCE(
+          json_agg(
             json_build_object(
               'id', tc.id,
               'user_id', tc.user_id,
@@ -115,6 +137,7 @@ router.get("/my", auth, async (req, res) => {
           '[]'
         ) AS comments
       FROM tickets t
+      LEFT JOIN ticket_attachments ta ON ta.ticket_id = t.id
       LEFT JOIN ticket_comments tc ON tc.ticket_id = t.id
       LEFT JOIN users assigned ON assigned.id = t.assigned_to
       WHERE t.user_id = $1

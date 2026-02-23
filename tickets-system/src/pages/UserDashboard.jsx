@@ -108,12 +108,15 @@ import { AuthContext } from '../context/AuthContext.jsx'
 import { getTickets } from '../services/api'
 import '../styles/dashboard.css'
 import '../styles/tickets.css'
+import Loader from '../components/Loader.jsx'
+import { useToast } from '../context/ToastContext.jsx'
 
 function UserDashboard() {
   const { user } = useContext(AuthContext)
   const [allTickets, setAllTickets] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
+  const { showError } = useToast()
 
   useEffect(() => {
     if (!user?.token) {
@@ -133,6 +136,7 @@ function UserDashboard() {
         // console.error('Failed to fetch tickets:', err)
         if (!cancelled) setAllTickets([])
         if (!cancelled) setError(err.message)
+        if (!cancelled) showError && showError(err.message || 'Failed to fetch tickets')
       } finally {
         if (!cancelled) setLoading(false)
       }
@@ -159,7 +163,7 @@ function UserDashboard() {
     return { total, open, inProgress, resolved }
   }, [myTickets])
 
-  if (loading) return <p>Loading tickets...</p>
+  if (loading) return <Loader message="Loading tickets..." />
   if (error) return <p className="error-message">Error: {error}</p>
 
   return (

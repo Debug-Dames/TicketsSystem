@@ -13,7 +13,7 @@ function Reports() {
 
   const visibleTickets = useMemo(() => {
     if (!user) return []
-    if (user.role === 'agent') return allTickets
+    if (user.role === 'support') return allTickets
     return allTickets.filter((ticket) => ticket.createdBy === user.email)
   }, [allTickets, user])
 
