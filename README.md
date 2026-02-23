@@ -1,37 +1,74 @@
-1) Project Overview
-The TicketsSystem  is a web-based ticket management application designed to allow users to log, track, and manage support or service requests. The system supports authentication, role-based access control, and ticket lifecycle management.
-The repository contains the following main components:
-⦁	Frontend: A Vite + React application located in the tickets-system/ directory. This provides the user interface for authentication and ticket interactions. At present, the frontend uses localStorage and mock services for data handling.
-⦁	Backend: A Node.js + Express application located in the backend/ directory. It exposes REST API routes for authentication (/api/auth) and ticket management (/api/tickets). Middleware is used for JWT authentication and role checks.
-⦁	Database: PostgreSQL using a pg connection pool (backend/db/db.js). The .env file references a PostgreSQL database hosted on Render.
-Repository state note: The backend includes PostgreSQL configuration. 
+# 🎫 TicketsSystem
 
-2) Clone the Repository
+A web-based ticket management application for logging, tracking, and managing support or service requests.
+
+✅ User authentication &nbsp;|&nbsp; ✅ Role-based access control &nbsp;|&nbsp; ✅ Ticket lifecycle management &nbsp;|&nbsp; ✅ Secure REST API
+
+---
+
+## 🏗 Repository Structure
+
+| Component | Tech | Directory | Notes |
+|-----------|------|-----------|-------|
+| **Frontend** | Vite + React | `tickets-system/` | Currently uses mock data via `localStorage` |
+| **Backend** | Node.js + Express | `backend/` | JWT auth, role-based middleware, PostgreSQL |
+| **Database** | PostgreSQL | `backend/db/db.js` | Hosted on Render (production) |
+
+### Backend API Routes
+
+- `POST /api/auth/register`
+- `POST /api/auth/login`
+- `GET /api/tickets` *(protected)*
+- `POST /api/tickets` *(protected)*
+- `PUT /api/tickets/:id` *(protected)*
+- `DELETE /api/tickets/:id` *(protected)*
+
+---
+
+## 🌍 Live Deployment
+
+**Frontend:** [https://ticketssystemfrontend.onrender.com](https://ticketssystemfrontend.onrender.com)
+
+---
+
+## ⚙️ Prerequisites
+
+- Node.js (v18+ recommended)
+- npm
+- PostgreSQL (local or hosted, e.g. Render)
+- Git
+- *(Optional)* Postman or curl
+- *(Optional)* Render account for deployment
+
+---
+
+## 📥 Clone the Repository
+
+```bash
 git clone https://github.com/Debug-Dames/TicketsSystem.git
 cd TicketsSystem
-Deployed Link: https://ticketssystemfrontend.onrender.com
+```
 
-3) Prerequisites
-To run and work with the project, the following are required:
-⦁	Node.js (v18 or later recommended)
-⦁	npm (or compatible package manager)
-⦁	PostgreSQL (local installation or hosted instance such as Render PostgreSQL)
-⦁	Git
-⦁	(Optional) Postman or curl for API testing
-⦁	A Render account for deployment (matching the current production setup)
+---
 
-4) Environment Variables (Backend)
-Create a .env file inside the backend/ directory with the following values:
+## 🔐 Environment Variables
+
+Create a `.env` file inside the `backend/` directory:
+
+```env
 DATABASE_URL=postgresql://<db_user>:<password>@<host>:<port>/<db_name>
 JWT_SECRET=your_jwt_secret_here
 PORT=5000
 NODE_ENV=development
+```
 
-Security note:
-Environment variables containing secrets must not be committed to version control. In production, these values are configured directly in the Render dashboard.
+> ⚠️ **Never commit `.env` files to version control.** In production, configure environment variables in the Render dashboard.
 
-5) Database Schema (PostgreSQL)
-Based on the intended schema defined in initDatabase.js, the following SQL represents the expected PostgreSQL schema:
+---
+
+## 🗄 Database Schema (PostgreSQL)
+
+```sql
 CREATE TABLE IF NOT EXISTS users (
   id SERIAL PRIMARY KEY,
   name VARCHAR(100) NOT NULL,
@@ -51,132 +88,131 @@ CREATE TABLE IF NOT EXISTS tickets (
   created_at TIMESTAMP WITH TIME ZONE DEFAULT now(),
   updated_at TIMESTAMP WITH TIME ZONE DEFAULT now()
 );
+```
 
-These scripts can be placed in a migrations/ directory or executed manually using psql or the Render database console.
+You can apply this schema by:
+- Running it manually via `psql`
+- Using the Render database console
+- Placing it inside a `migrations/` directory
 
-6) Running the System Locally
-6.1 Backend
-⦁	Navigate to the backend directory:
+---
+
+## 🚀 Running Locally
+
+### 🔧 Backend
+
+```bash
 cd backend
-
-⦁	Install dependencies:
 npm install
-
-⦁	Configure the .env file as described in Section 4.
-⦁	If using a local PostgreSQL database:
-⦁	Create a database and user
-⦁	Apply the schema from Section 5
-⦁	Update DATABASE_URL accordingly
-⦁	Start the backend server:
 npm run dev
+# or: npm start
+```
 
-or
-npm start
+Backend runs on: `http://localhost:5000`
 
-The backend server runs on port 5000 by default.
+### 🎨 Frontend
 
-6.2 Frontend
-⦁	Navigate to the frontend directory:
+```bash
 cd tickets-system
-
-⦁	Install dependencies:
 npm install
-
-⦁	Start the development server:
 npm run dev
+```
 
-The frontend is served by Vite, typically on http://localhost:5173.
-Note:
-The frontend currently operates in a mock mode using localStorage. Backend API integration requires implementing API calls in the frontend service layer.
+Frontend runs on: `http://localhost:5173`
 
-7) API Route Testing
-The backend API can be tested using curl or Postman.
-Assuming the backend is running on http://localhost:5000:
-Register
+> ⚠️ The frontend currently uses mock data via `localStorage`. Full API integration requires implementing a service-layer connecting to the backend.
+
+---
+
+## 🧪 API Testing (curl)
+
+> Assumes backend is running on `http://localhost:5000`
+
+**Register**
+```bash
 curl -X POST http://localhost:5000/api/auth/register \
- -H "Content-Type: application/json" \
- -d '{"name":"Alice","email":"alice@example.com","password":"secret123","role":"user"}'
+  -H "Content-Type: application/json" \
+  -d '{"name":"Alice","email":"alice@example.com","password":"secret123","role":"user"}'
+```
 
-Login
+**Login**
+```bash
 curl -X POST http://localhost:5000/api/auth/login \
- -H "Content-Type: application/json" \
- -d '{"email":"alice@example.com","password":"secret123"}'
+  -H "Content-Type: application/json" \
+  -d '{"email":"alice@example.com","password":"secret123"}'
+```
 
-Create Ticket (Authenticated)
+**Create Ticket** *(requires JWT)*
+```bash
 curl -X POST http://localhost:5000/api/tickets \
- -H "Content-Type: application/json" \
- -H "Authorization: Bearer <JWT_TOKEN>" \
- -d '{"title":"Printer broken","description":"Printer jammed","priority":"high"}'
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer <JWT_TOKEN>" \
+  -d '{"title":"Printer broken","description":"Printer jammed","priority":"high"}'
+```
 
-Get Tickets
+**Get Tickets** *(requires JWT)*
+```bash
 curl -X GET http://localhost:5000/api/tickets \
- -H "Authorization: Bearer <JWT_TOKEN>"
+  -H "Authorization: Bearer <JWT_TOKEN>"
+```
 
+> All protected routes require: `Authorization: Bearer <token>`
 
-8) API Specification (Inferred)
-Authentication Routes
-⦁	POST /api/auth/register
-⦁	POST /api/auth/login
-Ticket Routes (Protected)
-⦁	GET /api/tickets
-⦁	POST /api/tickets
-⦁	PUT /api/tickets/:id
-⦁	DELETE /api/tickets/:id
-JWT tokens must be supplied using the Authorization: Bearer <token> header.
+---
 
-9) Deployment on Render
-The system is deployed using Render, following a standard cloud deployment workflow.
-Backend Deployment
-⦁	Deployed as a Render Web Service
-⦁	Connected directly to the GitHub repository
-⦁	Build command installs dependencies
-⦁	Start command launches the Express server
-⦁	Environment variables are configured in Render
-Database
-⦁	PostgreSQL database hosted as a Render Managed Database
-⦁	Secure internal connection using DATABASE_URL
-Deployment Flow
-⦁	Code is pushed to GitHub
-⦁	Render detects changes
-⦁	Application is rebuilt and redeployed automatically
-⦁	Backend connects to the production database
+## ☁️ Deployment on Render
 
-10) Workflows and Data Flows
-Ticket Creation Workflow
-⦁	User logs in and receives a JWT
-⦁	User submits a ticket via the frontend
-⦁	Backend validates the token
-⦁	Ticket is stored in the database
-⦁	Ticket status is tracked until resolution
-Data Flow
+- **Backend:** Deployed as a Render Web Service, connected to GitHub with auto-deploy enabled
+- **Database:** PostgreSQL hosted via Render Managed Database, connected via `DATABASE_URL`
+- **Flow:** Push to GitHub → Render detects changes → Auto-rebuild → Backend connects to production DB
+
+---
+
+## 🔁 Data Flow
+
+```
 Frontend → Backend API → Database → Backend → Frontend
+```
 
-11) Use Cases
-⦁	End users submitting and tracking support tickets
-⦁	Agents reviewing and resolving tickets
-⦁	Administrators managing users and system data
-⦁	Internal helpdesk or support operations
+**Ticket Creation Workflow:**
+1. User logs in → receives JWT
+2. User submits ticket
+3. Backend validates token
+4. Ticket stored in database
+5. Status updated until resolution
 
-12) Known Issues and Recommendations
-Database Layer Inconsistency
-PostgreSQL configuration using pg.
-Recommendation:
-Migrate all database queries to use pg with parameterized queries ($1, $2, etc.) to ensure consistency.
-Frontend Mock Data
-The frontend currently relies on localStorage.
-Recommendation:
-Implement an API service layer to integrate frontend functionality with backend endpoints.
+---
 
-13) Future Enhancements
-⦁	Full frontend–backend API integration
-⦁	Ticket comments and attachments
-⦁	Email notifications
-⦁	Reporting and analytics
-⦁	Automated database migrations
-⦁	Unit and integration testing
+## 👥 Use Cases
 
-14) Conclusion
-The TicketsSystem provides a solid foundation for a secure and scalable ticket management platform. With completion of the PostgreSQL migration and frontend API integration, the system is suitable for real-world deployment and further expansion.
+- End users submitting and tracking support tickets
+- Agents reviewing and resolving tickets
+- Administrators managing users
+- Internal helpdesk operations
 
-﻿# TicketsSystem
+---
 
+## ⚠️ Known Issues & Recommendations
+
+**Database Layer Consistency**
+PostgreSQL queries use `pg`. Ensure all queries use parameterized statements (`$1`, `$2`, etc.) to prevent SQL injection.
+
+**Frontend Mock Mode**
+The frontend relies on `localStorage`. A proper API service layer is needed to fully integrate with backend endpoints.
+
+---
+
+## 🚀 Future Enhancements
+
+- Full frontend–backend API integration
+- Ticket comments & attachments
+- Email notifications
+- Reporting & analytics dashboard
+- Automated database migrations
+- Unit & integration testing
+
+---
+
+## 📄 License
+
+This project is maintained by [Debug-Dames](https://github.com/Debug-Dames).
