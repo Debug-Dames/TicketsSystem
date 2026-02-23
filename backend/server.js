@@ -24,6 +24,7 @@ const PORT = process.env.PORT || 5000;
 
     app.use("/api/auth", authRoutes);
     app.use("/api/tickets", ticketRoutes);
+    app.use("/uploads", express.static("uploads"));
 
     app.listen(PORT, () =>
       console.log(`Server running on http://localhost:${PORT}`)
@@ -34,8 +35,8 @@ const PORT = process.env.PORT || 5000;
   }
 })();
 
-app.listen(PORT, () =>
-    console.log(`Server running on http://localhost:${PORT}`)
-);
+// app.listen(PORT, () =>
+//     console.log(`Server running on http://localhost:${PORT}`)
+// );
 
 
