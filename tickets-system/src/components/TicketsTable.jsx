@@ -23,6 +23,11 @@ function TicketsTable({ tickets, isAgent, onStatusChange }) {
   const [sortBy, setSortBy] = useState('createdAt')
   const [sortDirection, setSortDirection] = useState('desc')
   const [showControls, setShowControls] = useState(false)
+  const [selectedTicket, setSelectedTicket] = useState(null)
+  const [modalData, setModalData] = useState(null)
+// { ticket: {}, type: "comments" | "uploads" }
+  const [commentModal, setCommentModal] = useState(null)
+// { ticket: {} }
 
   const categoryOptions = useMemo(
     () => [...new Set((tickets || []).map((ticket) => ticket.category).filter(Boolean))],
@@ -148,6 +153,130 @@ function TicketsTable({ tickets, isAgent, onStatusChange }) {
         </div>
       )}
 
+      {modalData && (
+        <div
+          className="modal-overlay active"
+          onClick={() => setModalData(null)}
+        >
+          <div
+            className="modal-card active"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <button
+              className="modal-close-x"
+              onClick={() => setModalData(null)}
+            >
+              ×
+            </button>
+
+            <h3 className="modal-title">
+              {modalData.type === "comments"
+                ? `Comments - ${modalData.ticket.title}`
+                : `Uploads - ${modalData.ticket.title}`}
+            </h3>
+
+            {modalData.type === "comments" && (
+              <div className="modal-comments-container">
+                {modalData.ticket.comments?.length ? (
+                  modalData.ticket.comments.map((comment) => (
+                    <div key={comment.id} className="modal-comment-item">
+                      <p className="modal-comment-text">
+                        {comment.comment}
+                      </p>
+                      <div className="modal-comment-meta">
+                        User ID: {comment.user_id}
+                      </div>
+                      <div className="modal-comment-time">
+                        {new Date(comment.created_at).toLocaleString()}
+                      </div>
+                    </div>
+                  ))
+                ) : (
+                  <p className="no-comments">No comments available</p>
+                )}
+              </div>
+            )}
+
+            {modalData.type === "uploads" && (
+              <div className="modal-attachments-section">
+                {modalData.ticket.attachments?.length ? (
+                  <ul className="attachments-list">
+                    {modalData.ticket.attachments.map((file) => (
+                      <li key={file.id}>
+                        <a
+                          href={`http://localhost:5000/${file.file_path}`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="attachment-link"
+                        >
+                          📎 View File
+                        </a>
+                      </li>
+                    ))}
+                  </ul>
+                ) : (
+                      <p className="no-comments">No uploads available</p>
+                )}
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+
+      {commentModal && (
+        <div
+          className="modal-overlay active"
+          onClick={() => setCommentModal(null)}
+        >
+          <div
+            className="modal-card active"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <button
+              className="modal-close-x"
+              onClick={() => setCommentModal(null)}
+            >
+              ×
+            </button>
+
+            <h3 className="modal-title">
+              Add Comment - {commentModal.title}
+            </h3>
+
+            <textarea
+              className="modal-textarea"
+              placeholder="Write your comment..."
+              value={draftComment[commentModal.id] || ""}
+              onChange={(e) =>
+                setDraftComment((prev) => ({
+                  ...prev,
+                  [commentModal.id]: e.target.value,
+                }))
+              }
+            />
+
+            <div className="modal-actions">
+              <button
+                className="cancel-btn"
+                onClick={() => setCommentModal(null)}
+              >
+                Cancel
+              </button>
+
+              <button
+                className="submit-btn"
+                onClick={() => {
+                  commitUpdate(commentModal)
+                  setCommentModal(null)
+                }}
+              >
+                Submit Comment
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {!visibleTickets.length ? (
         <p className='tickets-empty'>No tickets match your current filters.</p>
       ) : (
@@ -164,6 +293,7 @@ function TicketsTable({ tickets, isAgent, onStatusChange }) {
                 <th>Created By</th>
                 <th>Assigned Agent</th>
                 <th>Comments</th>
+                <th>Uploads</th>
                 {isAgent && <th>Actions</th>}
               </tr>
             </thead>
@@ -194,7 +324,7 @@ function TicketsTable({ tickets, isAgent, onStatusChange }) {
                   </td>
                   <td className='cell-wrap'>{ticket.createdBy}</td>
                   <td className='cell-wrap'>{ticket.assignedTo || 'Unassigned'}</td>
-                  <td className='cell-wrap'>
+                  {/* <td className='cell-wrap'>
                     {ticket.comments?.length ? (
                       <ul className='comments-list'>
                         {ticket.comments.map((comment, index) => (
@@ -206,25 +336,44 @@ function TicketsTable({ tickets, isAgent, onStatusChange }) {
                     ) : (
                       <span className='no-comments'>No comments</span>
                     )}
+                  </td> */}
+                  <td>
+                    {ticket.comments?.length ? (
+                      <button
+                        className="view-comments-btn"
+                        onClick={() => setModalData({ ticket, type: "comments" })}
+                      >
+                        View Comments ({ticket.comments.length})
+                      </button>
+                    ) : (
+                      <span className="no-comments">No comments</span>
+                    )}
+                  </td>
+                  <td>
+                    {ticket.attachments?.length ? (
+                      <button
+                        className="view-details-btn"
+                        onClick={() =>
+                          setModalData({ ticket, type: "uploads" })
+                        }
+                      >
+                        View Uploads ({ticket.attachments.length})
+                      </button>
+                    ) : (
+                      <span className="no-comments">No uploads</span>
+                    )}
                   </td>
                   {isAgent && (
                     <td>
-                      <textarea
-                        className='comment-input'
-                        placeholder='Add comment'
-                        value={draftComment[ticket.id] || ''}
-                        onChange={(event) =>
-                          setDraftComment((current) => ({
-                            ...current,
-                            [ticket.id]: event.target.value,
-                          }))
-                        }
-                      />
-                      <button type='button' className='update-button' onClick={() => commitUpdate(ticket)}>
-                        Update Status
+                      <button
+                        className="add-comment-btn"
+                        onClick={() => setCommentModal(ticket)}
+                      >
+                        Add Comment
                       </button>
                     </td>
                   )}
+                  
                 </tr>
               ))}
             </tbody>
