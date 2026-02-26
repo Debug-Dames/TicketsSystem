@@ -7,7 +7,7 @@ db.serialize(() => {
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             name VARCHAR(100) NOT NULL,
             email VARCHAR(150) NOT NULL UNIQUE,
-            password_hash TEXT NOT NULL,
+            password TEXT NOT NULL,
             role VARCHAR(20) NOT NULL,
             created_at DATETIME DEFAULT CURRENT_TIMESTAMP
         )
@@ -27,7 +27,7 @@ db.serialize(() => {
             FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
         )
     `);
-
+        
 });
 
 module.exports = db;

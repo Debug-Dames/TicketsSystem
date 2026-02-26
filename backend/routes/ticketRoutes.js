@@ -7,49 +7,71 @@ const role = require("../middleware/role");
 
 // CREATE TICKET (user)
 router.post("/", auth, (req, res) => {
-  const { title, description, category, priority } = req.body;
+  const { title, description, priority = "low" } = req.body;
 
-  const stmt = db.prepare(`
-    INSERT INTO tickets (title, description, category, priority, createdBy)
-    VALUES (?, ?, ?, ?, ?)
-  `);
+  db.run(
+    `INSERT INTO tickets (user_id, title, description, priority)
+     VALUES (?, ?, ?, ?)`,
+    [req.user.id, title, description, priority],
+    function (err) {
+      if (err) {
+        console.error(err);
+        return res.status(500).json({ message: "Error creating ticket" });
+      }
 
-  const result = stmt.run(
-    title,
-    description,
-    category,
-    priority,
-    req.user.id
+      res.json({ id: this.lastID });
+    }
   );
-
-  res.json({ id: result.lastInsertRowid });
 });
+
 
 
 // USER: view own tickets
 router.get("/my", auth, (req, res) => {
-  const tickets = db
-    .prepare("SELECT * FROM tickets WHERE createdBy = ?")
-    .all(req.user.id);
+  db.all(
+    "SELECT * FROM tickets WHERE user_id = ?",
+    [req.user.id],
+    (err, rows) => {
+      if (err) {
+        return res.status(500).json({ message: "Error fetching tickets" });
+      }
 
-  res.json(tickets);
+      res.json(rows);
+    }
+  );
 });
+
 
 
 // SUPPORT: view all
 router.get("/", auth, role("support"), (req, res) => {
-  const tickets = db.prepare("SELECT * FROM tickets").all();
-  res.json(tickets);
+  db.all("SELECT * FROM tickets", [], (err, rows) => {
+    if (err) {
+      return res.status(500).json({ message: "Error fetching tickets" });
+    }
+
+    res.json(rows);
+  });
 });
+
 
 
 // SUPPORT: update status
 router.patch("/:id/status", auth, role("support"), (req, res) => {
-  db.prepare(
-    "UPDATE tickets SET status = ? WHERE id = ?"
-  ).run(req.body.status, req.params.id);
+  const { status } = req.body;
 
-  res.json({ message: "Updated" });
+  db.run(
+    "UPDATE tickets SET status = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?",
+    [status, req.params.id],
+    function (err) {
+      if (err) {
+        return res.status(500).json({ message: "Error updating ticket" });
+      }
+
+      res.json({ message: "Updated" });
+    }
+  );
 });
+
 
 module.exports = router;
